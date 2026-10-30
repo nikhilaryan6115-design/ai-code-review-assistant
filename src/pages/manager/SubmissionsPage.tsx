@@ -61,38 +61,38 @@ export const SubmissionsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
-            <GitPullRequest className="w-5 h-5 text-wine" />
+          <h1 className="text-xl sm:text-2xl font-bold text-nocturne-ivory tracking-tight flex items-center gap-2 font-heading">
+            <GitPullRequest className="w-5 h-5 text-pumpkin" />
             Pull Request Submissions
           </h1>
-          <p className="text-xs text-warm-muted mt-1">
+          <p className="text-xs text-nocturne-grey mt-1">
             Browse and filter code submissions analyzed by Qwen2.5-Coder 7B before manual manager approval.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-warm-muted">
-            Showing <strong className="text-warm-charcoal">{filteredSubmissions.length}</strong> of {submissions.length} PRs
+          <span className="text-xs font-mono text-nocturne-grey">
+            Showing <strong className="text-nocturne-ivory">{filteredSubmissions.length}</strong> of {submissions.length} PRs
           </span>
         </div>
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-warm-white border border-warm-border rounded-xl p-4 shadow-warm-sm space-y-3">
+      <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-4 shadow-card space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search bar */}
           <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-warm-muted absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-nocturne-grey absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={effectiveSearch}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by title, PR #, or keyword..."
-              className="w-full bg-warm-bg border border-warm-border rounded-lg pl-9 pr-3 py-2 text-xs text-warm-charcoal placeholder-warm-dim focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
+              className="w-full bg-nocturne-charcoal border border-nocturne-border rounded-lg pl-9 pr-3 py-2 text-xs text-nocturne-ivory placeholder-nocturne-grey focus:outline-none focus:border-pumpkin/50 font-sans"
             />
           </div>
 
@@ -100,28 +100,28 @@ export const SubmissionsPage: React.FC = () => {
           <div>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full bg-warm-bg border border-warm-border rounded-lg px-3 py-2 text-xs text-warm-charcoal focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
+              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'completed')}
+              className="w-full bg-nocturne-charcoal border border-nocturne-border rounded-lg px-3 py-2 text-xs text-nocturne-ivory focus:outline-none focus:border-pumpkin/50 font-sans"
             >
               <option value="all">All Review Statuses</option>
-              <option value="pending">Pending Manager Review</option>
-              <option value="completed">Completed (Approved/Changes)</option>
+              <option value="pending">Pending Review Only</option>
+              <option value="completed">Completed / Signed-off</option>
             </select>
           </div>
 
-          {/* Risk Filter */}
+          {/* Risk Level Filter */}
           <div>
             <select
               value={riskFilter}
               onChange={(e) => setRiskFilter(e.target.value)}
-              className="w-full bg-warm-bg border border-warm-border rounded-lg px-3 py-2 text-xs text-warm-charcoal focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
+              className="w-full bg-nocturne-charcoal border border-nocturne-border rounded-lg px-3 py-2 text-xs text-nocturne-ivory focus:outline-none focus:border-pumpkin/50 font-sans"
             >
               <option value="all">All Risk Levels</option>
               <option value="critical">Critical Risk</option>
               <option value="high">High Risk</option>
               <option value="medium">Medium Risk</option>
               <option value="low">Low Risk</option>
-              <option value="safe">Safe / Passed</option>
+              <option value="safe">Passed / Safe</option>
             </select>
           </div>
 
@@ -130,7 +130,7 @@ export const SubmissionsPage: React.FC = () => {
             <select
               value={developerFilter}
               onChange={(e) => setDeveloperFilter(e.target.value)}
-              className="w-full bg-warm-bg border border-warm-border rounded-lg px-3 py-2 text-xs text-warm-charcoal focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
+              className="w-full bg-nocturne-charcoal border border-nocturne-border rounded-lg px-3 py-2 text-xs text-nocturne-ivory focus:outline-none focus:border-pumpkin/50 font-sans"
             >
               <option value="all">All Developers</option>
               {developers.map((dev) => (
@@ -142,40 +142,28 @@ export const SubmissionsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Select & Reset */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-warm-border/60 text-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-warm-dim font-mono text-[10px] uppercase font-semibold">Quick Select:</span>
-            <button
-              onClick={() => {
-                setStatusFilter('pending');
-                setRiskFilter('critical');
-              }}
-              className="px-2.5 py-1 rounded-md bg-red-50 border border-red-200 text-red-800 hover:bg-red-100 text-xs font-mono font-medium transition-colors"
+        {/* Second Row: Repository and Reset Button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-nocturne-border">
+          <div className="flex items-center gap-2">
+            <Filter className="w-3.5 h-3.5 text-nocturne-grey" />
+            <span className="text-xs text-nocturne-grey">Repository:</span>
+            <select
+              value={repositoryFilter}
+              onChange={(e) => setRepositoryFilter(e.target.value)}
+              className="bg-nocturne-charcoal border border-nocturne-border rounded-lg px-2.5 py-1 text-xs text-nocturne-ivory focus:outline-none focus:border-pumpkin/50 font-mono"
             >
-              Pending Criticals
-            </button>
-            <button
-              onClick={() => {
-                setDeveloperFilter('dev-1');
-              }}
-              className="px-2.5 py-1 rounded-md bg-buttercream/80 border border-warm-border text-warm-charcoal hover:bg-buttercream text-xs font-mono font-medium transition-colors"
-            >
-              Rahul Sharma
-            </button>
-            <button
-              onClick={() => {
-                setRepositoryFilter('authentication-service');
-              }}
-              className="px-2.5 py-1 rounded-md bg-warm-subtle border border-warm-border text-warm-muted hover:text-warm-charcoal text-xs font-mono transition-colors"
-            >
-              authentication-service
-            </button>
+              <option value="all">All Repositories</option>
+              {repositories.map((repo) => (
+                <option key={repo.id} value={repo.name}>
+                  {repo.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button
             onClick={resetFilters}
-            className="flex items-center gap-1.5 text-xs text-warm-muted hover:text-warm-charcoal transition-colors font-medium"
+            className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono text-nocturne-grey hover:text-nocturne-ivory rounded hover:bg-nocturne-charcoal transition-colors cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Filters</span>
@@ -184,10 +172,10 @@ export const SubmissionsPage: React.FC = () => {
       </div>
 
       {/* Submissions Table */}
-      <div className="bg-warm-white border border-warm-border rounded-xl overflow-hidden shadow-warm-sm">
+      <div className="bg-nocturne-plum border border-nocturne-border rounded-xl overflow-hidden shadow-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-warm-subtle/60 text-warm-muted font-mono uppercase tracking-wider text-[11px] border-b border-warm-border">
+            <thead className="bg-nocturne-charcoal/70 text-nocturne-grey font-mono uppercase tracking-wider text-[11px] border-b border-nocturne-border">
               <tr>
                 <th className="py-3 px-4 font-medium">PR # / Title</th>
                 <th className="py-3 px-4 font-medium">Developer</th>
@@ -199,14 +187,14 @@ export const SubmissionsPage: React.FC = () => {
                 <th className="py-3 px-4 text-right font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-warm-border/50 text-warm-charcoal">
+            <tbody className="divide-y divide-nocturne-border text-nocturne-ivory">
               {filteredSubmissions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-warm-muted">
+                  <td colSpan={8} className="py-12 text-center text-nocturne-grey">
                     <p className="font-mono text-sm">No submissions match the selected filters.</p>
                     <button
                       onClick={resetFilters}
-                      className="mt-3 px-3 py-1.5 text-xs text-wine font-medium hover:underline"
+                      className="mt-3 px-3 py-1.5 text-xs text-pumpkin font-medium hover:underline cursor-pointer"
                     >
                       Clear all filters
                     </button>
@@ -223,23 +211,23 @@ export const SubmissionsPage: React.FC = () => {
                     <tr
                       key={sub.id}
                       onClick={() => navigate(`/manager/reviews/${sub.id}`)}
-                      className="hover:bg-warm-subtle/50 cursor-pointer transition-colors group"
+                      className="hover:bg-nocturne-wine/40 cursor-pointer transition-colors group"
                     >
                       {/* PR # and title */}
                       <td className="py-3.5 px-4 font-mono">
                         <div className="flex items-center gap-2">
-                          <span className="text-wine font-bold">#{sub.prNumber}</span>
-                          <span className="text-warm-charcoal font-sans font-medium line-clamp-1 max-w-[220px] lg:max-w-[280px]">
+                          <span className="text-pumpkin font-bold">#{sub.prNumber}</span>
+                          <span className="text-nocturne-ivory font-sans font-medium line-clamp-1 max-w-[220px] lg:max-w-[280px]">
                             {sub.title}
                           </span>
                         </div>
-                        <div className="text-[10px] text-warm-dim mt-0.5 flex items-center gap-2">
+                        <div className="text-[10px] text-nocturne-grey mt-0.5 flex items-center gap-2">
                           <span>{sub.repository.branch}</span>
                           <span>→</span>
                           <span>{sub.repository.targetBranch}</span>
                           <span>•</span>
-                          <span className="text-emerald-700 font-semibold">+{sub.additions}</span>
-                          <span className="text-red-700 font-semibold">-{sub.deletions}</span>
+                          <span className="text-emerald-400 font-semibold">+{sub.additions}</span>
+                          <span className="text-red-400 font-semibold">-{sub.deletions}</span>
                         </div>
                       </td>
 
@@ -249,13 +237,13 @@ export const SubmissionsPage: React.FC = () => {
                           <img
                             src={sub.developer.avatar}
                             alt={sub.developer.name}
-                            className="w-7 h-7 rounded-full object-cover ring-1 ring-warm-border"
+                            className="w-7 h-7 rounded-full object-cover ring-1 ring-nocturne-border"
                           />
                           <div>
-                            <p className="text-warm-charcoal font-medium leading-none">
+                            <p className="text-nocturne-ivory font-medium leading-none">
                               {sub.developer.name}
                             </p>
-                            <p className="text-[10px] text-warm-muted mt-0.5">
+                            <p className="text-[10px] text-nocturne-grey mt-0.5">
                               {sub.developer.role}
                             </p>
                           </div>
@@ -263,44 +251,40 @@ export const SubmissionsPage: React.FC = () => {
                       </td>
 
                       {/* Repository */}
-                      <td className="py-3.5 px-4 font-mono text-warm-muted">
-                        <span className="px-2 py-0.5 rounded bg-warm-subtle border border-warm-border/60 text-[11px]">
+                      <td className="py-3.5 px-4 font-mono">
+                        <span className="px-2 py-0.5 rounded bg-nocturne-charcoal border border-nocturne-border text-[11px] text-nocturne-ivory">
                           {sub.repository.name}
                         </span>
                       </td>
 
-                      {/* Date */}
-                      <td className="py-3.5 px-4 font-mono text-warm-muted whitespace-nowrap text-[11px]">
+                      {/* Submission Date */}
+                      <td className="py-3.5 px-4 font-mono text-nocturne-grey">
                         {dateStr}
                       </td>
 
                       {/* Language */}
-                      <td className="py-3.5 px-4 font-mono text-[11px]">
-                        {sub.language}
+                      <td className="py-3.5 px-4 font-mono">
+                        <span className="text-nocturne-grey text-[11px]">
+                          {sub.language}
+                        </span>
                       </td>
 
-                      {/* Status */}
+                      {/* AI Review Status */}
                       <td className="py-3.5 px-4">
                         <StatusBadge status={sub.status} size="sm" />
                       </td>
 
-                      {/* Risk */}
+                      {/* Risk Assessment */}
                       <td className="py-3.5 px-4">
                         <RiskBadge level={sub.riskLevel} score={sub.riskScore} size="sm" />
                       </td>
 
                       {/* Action */}
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/manager/reviews/${sub.id}`);
-                          }}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-warm-white text-wine text-xs font-medium border border-warm-border hover:bg-wine hover:text-white transition-all shadow-warm-sm"
-                        >
-                          <span>Review</span>
+                        <span className="inline-flex items-center gap-1 text-xs text-pumpkin font-semibold group-hover:translate-x-0.5 transition-transform">
+                          Review
                           <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
+                        </span>
                       </td>
                     </tr>
                   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { RiskLevel } from '../../types';
 import { ShieldAlert, AlertTriangle, AlertCircle, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { SkullSVG } from '../halloween/SkullSVG';
 
 interface Props {
   level: RiskLevel;
@@ -18,27 +19,32 @@ export const RiskBadge: React.FC<Props> = ({
   const configs = {
     critical: {
       label: 'Critical Risk',
-      bg: 'bg-red-50 text-red-800 border-red-200/80',
+      bg: 'bg-red-950/60 text-red-400 border-red-800/60',
+      useSkull: true,
       icon: ShieldAlert,
     },
     high: {
       label: 'High Risk',
-      bg: 'bg-amber-50 text-amber-900 border-amber-300/80',
+      bg: 'bg-pumpkin-dark/20 text-pumpkin border-pumpkin/30',
+      useSkull: false,
       icon: AlertTriangle,
     },
     medium: {
       label: 'Medium Risk',
-      bg: 'bg-tobacco-50 text-tobacco-800 border-tobacco-200',
+      bg: 'bg-gold/10 text-gold border-gold/30',
+      useSkull: false,
       icon: AlertCircle,
     },
     low: {
       label: 'Low Risk',
-      bg: 'bg-warm-subtle text-warm-charcoal border-warm-border',
+      bg: 'bg-nocturne-charcoal text-nocturne-grey border-nocturne-border',
+      useSkull: false,
       icon: ShieldCheck,
     },
     safe: {
       label: 'Passed / Safe',
-      bg: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
+      bg: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40',
+      useSkull: false,
       icon: CheckCircle2,
     },
   };
@@ -52,11 +58,17 @@ export const RiskBadge: React.FC<Props> = ({
     lg: 'text-xs px-3 py-1.5 gap-2 font-medium font-sans',
   };
 
+  const iconSize = size === 'lg' ? 14 : 12;
+
   return (
     <span 
       className={`inline-flex items-center rounded-md border font-medium tracking-tight ${config.bg} ${sizeClasses[size]}`}
     >
-      {showIcon && <Icon className={size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5 shrink-0'} />}
+      {showIcon && (
+        config.useSkull
+          ? <SkullSVG size={iconSize} color="#F87171" className="shrink-0" />
+          : <Icon className={size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5 shrink-0'} />
+      )}
       <span>{config.label}</span>
       {score !== undefined && (
         <span className="opacity-75 font-semibold ml-0.5">

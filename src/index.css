@@ -3,45 +3,149 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: dark;
+  }
+
   body {
-    background-color: #F9F5EC;
-    color: #30272A;
+    background-color: #0F0C10;
+    color: #F5F2EB;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  /* Custom Warm Scrollbars */
+  /* Custom dark scrollbars - clean, human-designed */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #F4ECE0;
+    background: #0F0C10;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #D2BDA4;
-    border-radius: 9999px;
+    background: #2D232F;
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #987653;
+    background: #443246;
   }
 
-  /* Selection style */
+  /* Text selection */
   ::selection {
-    background-color: #F5E8C9;
-    color: #46212D;
+    background-color: #E87927;
+    color: #0F0C10;
   }
 }
 
-@layer utilities {
-  .subtle-border {
-    border-color: #E8DCB8;
+/* =========================================================
+   Signature Interaction: Running Pumpkin & Cinematic Charge
+   ========================================================= */
+
+/* Running bob & tilt simulation (legs/stride momentum) */
+@keyframes pumpkinRunningStride {
+  0% {
+    transform: translateY(0px) rotate(-3deg) scale(1, 0.98);
   }
-  
-  .glass-warm {
-    background-color: rgba(255, 253, 247, 0.85);
-    backdrop-filter: blur(8px);
+  25% {
+    transform: translateY(-14px) rotate(2deg) scale(0.98, 1.02);
   }
+  50% {
+    transform: translateY(0px) rotate(4deg) scale(1, 0.97);
+  }
+  75% {
+    transform: translateY(-14px) rotate(-2deg) scale(0.98, 1.02);
+  }
+  100% {
+    transform: translateY(0px) rotate(-3deg) scale(1, 0.98);
+  }
+}
+
+/* Eyes igniting into furious bright fire */
+@keyframes eyesIgnite {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(232, 121, 39, 0.4));
+  }
+  100% {
+    filter: drop-shadow(0 0 16px #FF8400) drop-shadow(0 0 32px #FF3700);
+  }
+}
+
+/* Ground camera shake as the pumpkin charges */
+@keyframes cameraRumble {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  15% {
+    transform: translate(-2px, 3px);
+  }
+  30% {
+    transform: translate(3px, -2px);
+  }
+  45% {
+    transform: translate(-3px, -1px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  75% {
+    transform: translate(-1px, 3px);
+  }
+  90% {
+    transform: translate(2px, -2px);
+  }
+}
+
+/* Screen flash impact just before navigation */
+@keyframes impactFlash {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.15;
+  }
+  70% {
+    opacity: 0.85;
+    background-color: #E87927;
+  }
+  100% {
+    opacity: 1;
+    background-color: #1A0D13;
+  }
+}
+
+.animate-pumpkin-stride {
+  animation: pumpkinRunningStride 0.22s infinite ease-in-out;
+}
+
+.animate-eyes-ignite {
+  animation: eyesIgnite 0.25s forwards ease-out;
+}
+
+.animate-camera-rumble {
+  animation: cameraRumble 0.1s infinite;
+}
+
+.animate-impact-flash {
+  animation: impactFlash 0.3s forwards ease-in;
+}
+
+/* Candle subtle flicker for realism */
+@keyframes subtleCandle {
+  0%, 100% {
+    opacity: 0.92;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.animate-candle-subtle {
+  animation: subtleCandle 2.5s infinite ease-in-out;
 }

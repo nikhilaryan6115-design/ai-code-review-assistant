@@ -16,28 +16,28 @@ export const StatusBadge: React.FC<Props> = ({ status, size = 'md' }) => {
   }> = {
     ai_reviewing: {
       label: 'AI Reviewing...',
-      bg: 'bg-wine-50 text-wine-800 border-wine-200',
+      bg: 'bg-wine-900/40 text-pumpkin border-wine-700/40',
       icon: Loader2,
       animate: true,
     },
     ai_completed: {
       label: 'AI Analysis Ready',
-      bg: 'bg-buttercream-100 text-tobacco-800 border-buttercream-300',
+      bg: 'bg-gold/10 text-gold border-gold/30',
       icon: GitPullRequest,
     },
     changes_requested: {
       label: 'Changes Requested',
-      bg: 'bg-amber-50 text-amber-900 border-amber-300/80',
+      bg: 'bg-pumpkin-dark/20 text-pumpkin border-pumpkin/30',
       icon: AlertOctagon,
     },
     approved: {
       label: 'Approved',
-      bg: 'bg-emerald-50 text-emerald-800 border-emerald-300/80',
+      bg: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40',
       icon: CheckCircle2,
     },
     merged: {
       label: 'Merged',
-      bg: 'bg-warm-subtle text-warm-charcoal border-warm-borderStrong',
+      bg: 'bg-nocturne-charcoal text-nocturne-grey border-nocturne-border',
       icon: GitMerge,
     },
   };
@@ -55,7 +55,7 @@ export const StatusBadge: React.FC<Props> = ({ status, size = 'md' }) => {
     <span
       className={`inline-flex items-center rounded-md border font-medium tracking-tight ${config.bg} ${sizeClasses[size]}`}
     >
-      <Icon className={`w-3.5 h-3.5 shrink-0 ${config.animate ? 'animate-spin text-wine-700' : ''}`} />
+      <Icon className={`w-3.5 h-3.5 shrink-0 ${config.animate ? 'animate-spin text-pumpkin' : ''}`} />
       <span>{config.label}</span>
     </span>
   );

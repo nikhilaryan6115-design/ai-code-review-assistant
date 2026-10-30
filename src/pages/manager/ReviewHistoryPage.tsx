@@ -28,23 +28,23 @@ export const ReviewHistoryPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
-            <History className="w-5 h-5 text-wine" />
+          <h1 className="text-xl sm:text-2xl font-bold text-nocturne-ivory tracking-tight flex items-center gap-2">
+            <History className="w-5 h-5 text-pumpkin" />
             Code Review Audit & History
           </h1>
-          <p className="text-xs text-warm-muted mt-1">
+          <p className="text-xs text-nocturne-grey mt-1">
             Complete audit trail of AI automated evaluations, manager sign-offs, and developer feedback threads.
           </p>
         </div>
 
         {/* Filter buttons */}
-        <div className="flex items-center gap-1.5 bg-warm-white border border-warm-border p-1 rounded-lg shadow-warm-sm">
+        <div className="flex items-center gap-1.5 bg-nocturne-plum border border-nocturne-border p-1 rounded-lg shadow-card">
           <button
             onClick={() => setFilterDecision('all')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'all'
-                ? 'bg-wine text-white font-semibold'
-                : 'text-warm-muted hover:text-warm-charcoal'
+                ? 'bg-pumpkin text-nocturne-bg font-semibold'
+                : 'text-nocturne-grey hover:text-nocturne-ivory'
             }`}
           >
             All Logs ({submissions.length})
@@ -54,7 +54,7 @@ export const ReviewHistoryPage: React.FC = () => {
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'approved'
                 ? 'bg-emerald-700 text-white font-semibold'
-                : 'text-warm-muted hover:text-warm-charcoal'
+                : 'text-nocturne-grey hover:text-nocturne-ivory'
             }`}
           >
             Approved
@@ -64,7 +64,7 @@ export const ReviewHistoryPage: React.FC = () => {
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'changes_requested'
                 ? 'bg-amber-700 text-white font-semibold'
-                : 'text-warm-muted hover:text-warm-charcoal'
+                : 'text-nocturne-grey hover:text-nocturne-ivory'
             }`}
           >
             Changes Requested
@@ -79,15 +79,15 @@ export const ReviewHistoryPage: React.FC = () => {
             <div
               key={sub.id}
               onClick={() => navigate(`/manager/reviews/${sub.id}`)}
-              className="bg-warm-white border border-warm-border rounded-xl p-5 hover:border-warm-borderStrong transition-all cursor-pointer shadow-warm-sm space-y-3.5"
+              className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 hover:border-nocturne-borderSubtle transition-all cursor-pointer shadow-card space-y-3.5"
             >
               {/* Row 1: Top info & status */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-warm-border/60 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-nocturne-border pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-wine font-bold text-xs">
+                  <span className="font-mono text-pumpkin font-bold text-xs">
                     PR #{sub.prNumber}
                   </span>
-                  <span className="text-warm-charcoal font-semibold text-sm line-clamp-1">
+                  <span className="text-nocturne-ivory font-semibold text-sm line-clamp-1">
                     {sub.title}
                   </span>
                 </div>
@@ -104,23 +104,23 @@ export const ReviewHistoryPage: React.FC = () => {
                   <img
                     src={sub.developer.avatar}
                     alt={sub.developer.name}
-                    className="w-6 h-6 rounded-full object-cover ring-1 ring-warm-border"
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-nocturne-border"
                   />
                   <div>
-                    <span className="text-warm-charcoal font-sans font-medium">{sub.developer.name}</span>
-                    <span className="text-warm-muted text-[11px] block">{sub.repository.name}</span>
+                    <span className="text-nocturne-ivory font-sans font-medium">{sub.developer.name}</span>
+                    <span className="text-nocturne-grey text-[11px] block">{sub.repository.name}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-warm-muted">
+                <div className="flex items-center gap-2 text-nocturne-grey">
                   <Clock className="w-3.5 h-3.5 text-tobacco" />
                   <span>
                     Submitted: {new Date(sub.submissionDate).toLocaleDateString()}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-warm-muted md:justify-end">
-                  <Bot className="w-3.5 h-3.5 text-wine" />
+                <div className="flex items-center gap-2 text-nocturne-grey md:justify-end">
+                  <Bot className="w-3.5 h-3.5 text-pumpkin" />
                   <span>AI Pre-check: {sub.reviewTimeSeconds || 14}s</span>
                 </div>
               </div>
@@ -130,16 +130,16 @@ export const ReviewHistoryPage: React.FC = () => {
                 <div
                   className={`p-3 rounded-lg border text-xs ${
                     sub.managerDecision.decision === 'approved'
-                      ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
-                      : 'bg-amber-50 text-amber-900 border-amber-300'
+                      ? 'bg-emerald-950/40 text-emerald-900 border-emerald-800/40'
+                      : 'bg-pumpkin-dark/15 text-pumpkin border-pumpkin/30'
                   }`}
                 >
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase font-bold mb-1">
                     <span className="flex items-center gap-1.5">
                       {sub.managerDecision.decision === 'approved' ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                       ) : (
-                        <XCircle className="w-3.5 h-3.5 text-amber-700" />
+                        <XCircle className="w-3.5 h-3.5 text-pumpkin" />
                       )}
                       Manager Action: {sub.managerDecision.decision.replace('_', ' ')}
                     </span>
@@ -147,14 +147,14 @@ export const ReviewHistoryPage: React.FC = () => {
                       Sign-off by {sub.managerDecision.managerName}
                     </span>
                   </div>
-                  <p className="text-warm-charcoal font-sans mt-1 leading-relaxed">
+                  <p className="text-nocturne-ivory font-sans mt-1 leading-relaxed">
                     "{sub.managerDecision.feedback}"
                   </p>
                 </div>
               ) : (
-                <div className="p-3 rounded-lg bg-warm-subtle/70 border border-warm-border text-xs text-warm-muted flex items-center justify-between">
+                <div className="p-3 rounded-lg bg-nocturne-charcoal border border-nocturne-border text-xs text-nocturne-grey flex items-center justify-between">
                   <span>Manager decision is currently pending review.</span>
-                  <span className="text-wine font-medium hover:underline flex items-center gap-1">
+                  <span className="text-pumpkin font-medium hover:underline flex items-center gap-1">
                     Open Review Details <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>

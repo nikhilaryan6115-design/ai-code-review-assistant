@@ -45,7 +45,7 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-warm-bg text-warm-charcoal flex flex-col font-sans selection:bg-buttercream selection:text-wine-900">
+    <div className="min-h-screen bg-nocturne-bg text-nocturne-ivory flex flex-col font-sans selection:bg-nocturne-charcoal selection:text-pumpkin">
       <Navbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />

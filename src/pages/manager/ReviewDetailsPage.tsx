@@ -77,22 +77,22 @@ export const ReviewDetailsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Breadcrumb & Action Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-warm-border pb-4 bg-warm-white p-4 rounded-xl shadow-warm-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nocturne-border pb-4 bg-nocturne-plum p-4 rounded-xl shadow-card">
         <div className="flex items-center gap-3">
           <Link
             to="/manager/submissions"
-            className="p-2 rounded-lg bg-warm-subtle/80 border border-warm-border text-warm-charcoal hover:bg-warm-subtle transition-colors"
+            className="p-2 rounded-lg bg-nocturne-charcoal border border-nocturne-border text-nocturne-ivory hover:bg-nocturne-wine transition-colors"
             title="Back to submissions"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-warm-muted">
+            <div className="flex items-center gap-2 text-xs font-mono text-nocturne-grey">
               <span>{submission.repository.name}</span>
               <span>/</span>
-              <span className="text-wine font-semibold">Pull Request #{submission.prNumber}</span>
+              <span className="text-pumpkin font-semibold">Pull Request #{submission.prNumber}</span>
             </div>
-            <h1 className="text-lg font-bold text-warm-charcoal tracking-tight flex items-center gap-2 mt-0.5">
+            <h1 className="text-lg font-bold text-nocturne-ivory tracking-tight flex items-center gap-2 mt-0.5">
               <span>{submission.title}</span>
             </h1>
           </div>
@@ -103,7 +103,7 @@ export const ReviewDetailsPage: React.FC = () => {
           <button
             onClick={() => triggerAIScan(submission.id)}
             disabled={submission.status === 'ai_reviewing'}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-warm-white border border-warm-border text-xs font-mono text-warm-charcoal hover:bg-warm-subtle transition-all disabled:opacity-50 shadow-warm-sm"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-nocturne-charcoal border border-nocturne-border text-xs font-mono text-nocturne-ivory hover:bg-nocturne-wine transition-all disabled:opacity-50 shadow-card"
             title="Re-run Qwen2.5-Coder 7B"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-tobacco ${submission.status === 'ai_reviewing' ? 'animate-spin' : ''}`} />
@@ -112,7 +112,7 @@ export const ReviewDetailsPage: React.FC = () => {
 
           <button
             onClick={() => setModalType('request_changes')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 text-xs font-semibold transition-all shadow-warm-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-pumpkin-dark/15 border border-pumpkin/30 text-pumpkin hover:bg-amber-100 text-xs font-semibold transition-all shadow-card"
           >
             <XCircle className="w-3.5 h-3.5" />
             <span>Request Changes</span>
@@ -120,7 +120,7 @@ export const ReviewDetailsPage: React.FC = () => {
 
           <button
             onClick={() => setModalType('approve')}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-wine hover:bg-wine-800 text-white text-xs font-semibold shadow-wine-sm transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pumpkin hover:bg-pumpkin-dark text-nocturne-bg text-xs font-semibold shadow-card transition-all"
           >
             <Check className="w-3.5 h-3.5" />
             <span>Approve PR</span>
@@ -131,16 +131,16 @@ export const ReviewDetailsPage: React.FC = () => {
       {/* Decision Banner if already decided */}
       {submission.managerDecision && (
         <div
-          className={`p-4 rounded-xl border flex items-start gap-3 shadow-warm-sm ${
+          className={`p-4 rounded-xl border flex items-start gap-3 shadow-card ${
             submission.managerDecision.decision === 'approved'
-              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
-              : 'bg-amber-50 text-amber-900 border-amber-300'
+              ? 'bg-emerald-950/40 text-emerald-900 border-emerald-300'
+              : 'bg-pumpkin-dark/15 text-pumpkin border-pumpkin/30'
           }`}
         >
           {submission.managerDecision.decision === 'approved' ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-pumpkin shrink-0 mt-0.5" />
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
@@ -166,9 +166,9 @@ export const ReviewDetailsPage: React.FC = () => {
         {/* Left Column (5 cols): Metadata, AI Overview, Categorized Issues */}
         <div className="lg:col-span-5 space-y-5">
           {/* 1. Code Submission Summary Card */}
-          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
-              <span className="text-xs font-mono uppercase tracking-wider text-warm-muted font-medium">
+          <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card space-y-4">
+            <div className="flex items-center justify-between border-b border-nocturne-border pb-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-nocturne-grey font-medium">
                 Submission Metadata
               </span>
               <StatusBadge status={submission.status} size="sm" />
@@ -178,39 +178,39 @@ export const ReviewDetailsPage: React.FC = () => {
               <img
                 src={submission.developer.avatar}
                 alt={submission.developer.name}
-                className="w-10 h-10 rounded-full object-cover ring-1 ring-warm-border"
+                className="w-10 h-10 rounded-full object-cover ring-1 ring-nocturne-border"
               />
               <div>
-                <p className="text-sm font-bold text-warm-charcoal">
+                <p className="text-sm font-bold text-nocturne-ivory">
                   {submission.developer.name}
                 </p>
-                <p className="text-xs text-warm-muted font-mono">
+                <p className="text-xs text-nocturne-grey font-mono">
                   {submission.developer.email} • {submission.developer.role}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
-                <span className="text-warm-muted text-[10px] block">Branch</span>
-                <span className="text-wine font-semibold truncate block">
+              <div className="p-2.5 rounded-lg bg-nocturne-charcoal border border-nocturne-border">
+                <span className="text-nocturne-grey text-[10px] block">Branch</span>
+                <span className="text-pumpkin font-semibold truncate block">
                   {submission.repository.branch}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
-                <span className="text-warm-muted text-[10px] block">Language</span>
-                <span className="text-warm-charcoal font-semibold">{submission.language}</span>
+              <div className="p-2.5 rounded-lg bg-nocturne-charcoal border border-nocturne-border">
+                <span className="text-nocturne-grey text-[10px] block">Language</span>
+                <span className="text-nocturne-ivory font-semibold">{submission.language}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
-                <span className="text-warm-muted text-[10px] block">Diff Changes</span>
-                <span className="text-warm-charcoal font-medium">
-                  <span className="text-emerald-700 font-semibold">+{submission.additions}</span>{' '}
-                  <span className="text-red-700 font-semibold">-{submission.deletions}</span>
+              <div className="p-2.5 rounded-lg bg-nocturne-charcoal border border-nocturne-border">
+                <span className="text-nocturne-grey text-[10px] block">Diff Changes</span>
+                <span className="text-nocturne-ivory font-medium">
+                  <span className="text-emerald-400 font-semibold">+{submission.additions}</span>{' '}
+                  <span className="text-red-400 font-semibold">-{submission.deletions}</span>
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
-                <span className="text-warm-muted text-[10px] block">AI Scan Time</span>
-                <span className="text-emerald-800 font-semibold">
+              <div className="p-2.5 rounded-lg bg-nocturne-charcoal border border-nocturne-border">
+                <span className="text-nocturne-grey text-[10px] block">AI Scan Time</span>
+                <span className="text-emerald-400 font-semibold">
                   {submission.reviewTimeSeconds || 14}s
                 </span>
               </div>
@@ -218,10 +218,10 @@ export const ReviewDetailsPage: React.FC = () => {
           </div>
 
           {/* 3. Overall Risk Assessment Meter */}
-          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-3">
-            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
-              <span className="text-xs font-mono uppercase tracking-wider text-warm-muted font-medium flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-red-700" />
+          <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card space-y-3">
+            <div className="flex items-center justify-between border-b border-nocturne-border pb-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-nocturne-grey font-medium flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
                 Overall Risk Assessment
               </span>
               <RiskBadge level={submission.riskLevel} score={submission.riskScore} size="sm" />
@@ -230,14 +230,14 @@ export const ReviewDetailsPage: React.FC = () => {
             {/* Risk Gauge Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-warm-muted">Threat Composite Score</span>
+                <span className="text-nocturne-grey">Threat Composite Score</span>
                 <span className={`font-bold ${
-                  submission.riskScore > 75 ? 'text-red-800' : submission.riskScore > 40 ? 'text-amber-800' : 'text-emerald-800'
+                  submission.riskScore > 75 ? 'text-red-400' : submission.riskScore > 40 ? 'text-pumpkin' : 'text-emerald-400'
                 }`}>
                   {submission.riskScore} / 100
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-warm-subtle rounded-full overflow-hidden border border-warm-border">
+              <div className="w-full h-2.5 bg-nocturne-charcoal rounded-full overflow-hidden border border-nocturne-border">
                 <div
                   className={`h-full transition-all duration-500 rounded-full ${
                     submission.riskScore > 75
@@ -253,15 +253,15 @@ export const ReviewDetailsPage: React.FC = () => {
 
             {/* Findings Pill Counters */}
             <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs font-mono">
-              <div className="p-2 rounded-lg bg-red-50 border border-red-200 text-red-900">
+              <div className="p-2 rounded-lg bg-red-950/40 border border-red-900/40 text-red-900">
                 <span className="block text-base font-bold">{criticalIssuesCount}</span>
                 <span className="text-[10px] uppercase font-medium">Critical</span>
               </div>
-              <div className="p-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900">
+              <div className="p-2 rounded-lg bg-pumpkin-dark/15 border border-pumpkin/30 text-pumpkin">
                 <span className="block text-base font-bold">{warningsCount}</span>
                 <span className="text-[10px] uppercase font-medium">Warnings</span>
               </div>
-              <div className="p-2 rounded-lg bg-warm-subtle border border-warm-border text-warm-charcoal">
+              <div className="p-2 rounded-lg bg-nocturne-charcoal border border-nocturne-border text-nocturne-ivory">
                 <span className="block text-base font-bold">{submission.issues.length}</span>
                 <span className="text-[10px] uppercase font-medium">Total</span>
               </div>
@@ -269,34 +269,34 @@ export const ReviewDetailsPage: React.FC = () => {
           </div>
 
           {/* 2. AI-Generated Summary & Explanation (Qwen2.5-Coder 7B) */}
-          <div className="bg-buttercream/50 border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-3">
-            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
+          <div className="bg-nocturne-plum/80 border border-nocturne-border rounded-xl p-5 shadow-card space-y-3">
+            <div className="flex items-center justify-between border-b border-nocturne-border pb-3">
               <div className="flex items-center gap-2">
-                <div className="p-1 rounded bg-wine/10 text-wine">
+                <div className="p-1 rounded bg-wine/10 text-pumpkin">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-warm-charcoal font-mono uppercase tracking-wider">
+                  <h3 className="text-xs font-bold text-nocturne-ivory font-mono uppercase tracking-wider">
                     Qwen2.5-Coder 7B Synthesis
                   </h3>
-                  <span className="text-[10px] text-warm-muted font-mono">Engine: {submission.aiModel}</span>
+                  <span className="text-[10px] text-nocturne-grey font-mono">Engine: {submission.aiModel}</span>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40 font-medium">
                 Analysis Ready
               </span>
             </div>
 
             {/* AI Summary Quote (Matches Prompt Sample) */}
-            <blockquote className="p-3.5 rounded-lg bg-warm-white border border-warm-border text-xs text-warm-charcoal leading-relaxed font-sans italic">
+            <blockquote className="p-3.5 rounded-lg bg-nocturne-plum border border-nocturne-border text-xs text-nocturne-ivory leading-relaxed font-sans italic">
               "{submission.aiSummary}"
             </blockquote>
 
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-warm-muted font-semibold block mb-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-nocturne-grey font-semibold block mb-1">
                 Architecture & Security Assessment
               </span>
-              <p className="text-xs text-warm-charcoal leading-relaxed font-sans">
+              <p className="text-xs text-nocturne-ivory leading-relaxed font-sans">
                 {submission.aiExplanation}
               </p>
             </div>
@@ -306,10 +306,10 @@ export const ReviewDetailsPage: React.FC = () => {
           <div className="space-y-3.5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-warm-charcoal tracking-tight">
+                <h3 className="text-sm font-bold text-nocturne-ivory tracking-tight">
                   Actionable AI Findings ({submission.issues.length})
                 </h3>
-                <p className="text-[11px] text-warm-muted">Select an issue to highlight line in code viewer</p>
+                <p className="text-[11px] text-nocturne-grey">Select an issue to highlight line in code viewer</p>
               </div>
             </div>
 
@@ -319,8 +319,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('all')}
                 className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'all'
-                    ? 'bg-wine text-white font-bold shadow-wine-sm'
-                    : 'bg-warm-white text-warm-muted hover:text-warm-charcoal border border-warm-border'
+                    ? 'bg-pumpkin text-nocturne-bg font-semibold shadow-card'
+                    : 'bg-nocturne-plum text-nocturne-grey hover:text-nocturne-ivory border border-nocturne-border'
                 }`}
               >
                 All ({submission.issues.length})
@@ -331,7 +331,7 @@ export const ReviewDetailsPage: React.FC = () => {
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'critical'
                     ? 'bg-red-800 text-white font-bold'
-                    : 'bg-warm-white text-red-800 hover:bg-red-50 border border-red-200'
+                    : 'bg-nocturne-plum text-red-400 hover:bg-red-950/40 border border-red-900/40'
                 }`}
               >
                 <ShieldAlert className="w-3 h-3" />
@@ -343,7 +343,7 @@ export const ReviewDetailsPage: React.FC = () => {
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'security'
                     ? 'bg-tobacco text-white font-bold'
-                    : 'bg-warm-white text-tobacco hover:bg-tobacco-50 border border-tobacco-200'
+                    : 'bg-nocturne-plum text-nocturne-grey hover:bg-nocturne-charcoal border border-nocturne-border'
                 }`}
               >
                 <Shield className="w-3 h-3" />
@@ -355,7 +355,7 @@ export const ReviewDetailsPage: React.FC = () => {
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'performance'
                     ? 'bg-amber-800 text-white font-bold'
-                    : 'bg-warm-white text-amber-900 hover:bg-amber-50 border border-amber-300'
+                    : 'bg-nocturne-plum text-pumpkin hover:bg-pumpkin-dark/15 border border-pumpkin/30'
                 }`}
               >
                 <Zap className="w-3 h-3" />
@@ -367,7 +367,7 @@ export const ReviewDetailsPage: React.FC = () => {
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'quality'
                     ? 'bg-emerald-800 text-white font-bold'
-                    : 'bg-warm-white text-emerald-800 hover:bg-emerald-50 border border-emerald-300'
+                    : 'bg-nocturne-plum text-emerald-400 hover:bg-emerald-950/40 border border-emerald-300'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
@@ -396,11 +396,11 @@ export const ReviewDetailsPage: React.FC = () => {
           {/* Code Viewer Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
-                <FileCode2 className="w-4 h-4 text-wine" />
+              <h3 className="text-sm font-bold text-nocturne-ivory tracking-tight flex items-center gap-2">
+                <FileCode2 className="w-4 h-4 text-pumpkin" />
                 Code Inspection with Problem Line Highlighting
               </h3>
-              <p className="text-[11px] text-warm-muted">
+              <p className="text-[11px] text-nocturne-grey">
                 Line 42: SQL injection (Critical) • Line 18: Missing validation • Line 67: Inefficient loop
               </p>
             </div>
@@ -415,15 +415,15 @@ export const ReviewDetailsPage: React.FC = () => {
           />
 
           {/* Manager Feedback & Comments Section */}
-          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
+          <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card space-y-4">
+            <div className="flex items-center justify-between border-b border-nocturne-border pb-3">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-wine" />
-                <h4 className="text-xs font-bold text-warm-charcoal uppercase font-mono tracking-wider">
+                <MessageSquare className="w-4 h-4 text-pumpkin" />
+                <h4 className="text-xs font-bold text-nocturne-ivory uppercase font-mono tracking-wider">
                   Manager Feedback & Instruction Thread
                 </h4>
               </div>
-              <span className="text-[10px] font-mono text-warm-muted">
+              <span className="text-[10px] font-mono text-nocturne-grey">
                 {commentList.length} updates
               </span>
             </div>
@@ -431,9 +431,9 @@ export const ReviewDetailsPage: React.FC = () => {
             {/* Comment Thread */}
             <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
               {commentList.map((c, i) => (
-                <div key={i} className="p-3 rounded-lg bg-warm-subtle/60 border border-warm-border text-xs text-warm-charcoal">
-                  <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-warm-muted">
-                    <span className="font-semibold text-wine">
+                <div key={i} className="p-3 rounded-lg bg-nocturne-charcoal border border-nocturne-border text-xs text-nocturne-ivory">
+                  <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-nocturne-grey">
+                    <span className="font-semibold text-pumpkin">
                       {i === 0 ? 'RevAI Bot (Qwen2.5-Coder)' : 'Sarah Jenkins (Manager)'}
                     </span>
                     <span>Just now</span>
@@ -450,11 +450,11 @@ export const ReviewDetailsPage: React.FC = () => {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Add instruction or note for developer..."
-                className="flex-1 bg-warm-bg border border-warm-border rounded-lg px-3 py-2 text-xs text-warm-charcoal placeholder-warm-dim focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
+                className="flex-1 bg-nocturne-bg border border-nocturne-border rounded-lg px-3 py-2 text-xs text-nocturne-ivory placeholder-nocturne-grey focus:outline-none focus:border-wine focus:bg-nocturne-plum font-sans"
               />
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-wine hover:bg-wine-800 text-white text-xs font-semibold shadow-wine-sm transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-pumpkin hover:bg-pumpkin-dark text-nocturne-bg text-xs font-semibold shadow-card transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Send</span>
