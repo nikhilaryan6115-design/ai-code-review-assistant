@@ -34,7 +34,7 @@ export const CodeViewer: React.FC<Props> = ({
 
   if (!activeFile) {
     return (
-      <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-8 text-center text-nocturne-grey text-xs">
+      <div className="bg-[#161B22] border border-[#2E3643] rounded p-8 text-center text-[#96A0B0] text-xs">
         No code files found for this submission.
       </div>
     );
@@ -57,9 +57,9 @@ export const CodeViewer: React.FC<Props> = ({
   };
 
   return (
-    <div className="bg-nocturne-plum border border-nocturne-border rounded-xl overflow-hidden shadow-card flex flex-col">
+    <div className="bg-[#161B22] border border-[#2E3643] rounded overflow-hidden shadow-sm flex flex-col">
       {/* File Header & Tabs */}
-      <div className="bg-nocturne-charcoal/70 border-b border-nocturne-border px-3 py-2 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#1D232C] border-b border-[#2E3643] px-3 py-2 flex flex-wrap items-center justify-between gap-3">
         {/* File Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
           {codeFiles.map((file, idx) => {
@@ -74,19 +74,19 @@ export const CodeViewer: React.FC<Props> = ({
                   setActiveFileIndex(idx);
                   setExpandedAnnotationLine(null);
                 }}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-nocturne-plum text-pumpkin border border-nocturne-border font-semibold shadow-card'
-                    : 'text-nocturne-grey hover:text-nocturne-ivory hover:bg-nocturne-plum/60 border border-transparent'
+                    ? 'bg-[#161B22] text-[#F2F4F8] border border-[#2E3643] font-medium shadow-sm'
+                    : 'text-[#96A0B0] hover:text-[#F2F4F8] hover:bg-[#161B22]/50 border border-transparent'
                 }`}
               >
-                <FileCode2 className={`w-3.5 h-3.5 ${isActive ? 'text-pumpkin' : 'text-nocturne-grey'}`} />
+                <FileCode2 className={`w-3.5 h-3.5 ${isActive ? 'text-[#C5A059]' : 'text-[#96A0B0]'}`} />
                 <span>{file.filename}</span>
                 {hasCritical && (
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Critical Issue" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#A63232]" title="Critical Issue" />
                 )}
                 {!hasCritical && hasWarnings && (
-                  <span className="w-2 h-2 rounded-full bg-pumpkin" title="Warning" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#B7791F]" title="Warning" />
                 )}
               </button>
             );
@@ -96,35 +96,35 @@ export const CodeViewer: React.FC<Props> = ({
         {/* View Mode controls & Copy */}
         <div className="flex items-center gap-2">
           {/* Mode Switcher */}
-          <div className="flex items-center bg-nocturne-plum border border-nocturne-border rounded-lg p-0.5">
+          <div className="flex items-center bg-[#0E1116] border border-[#2E3643] rounded p-0.5">
             <button
               onClick={() => setViewMode('standard')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer ${
                 viewMode === 'standard'
-                  ? 'bg-nocturne-charcoal text-nocturne-ivory font-semibold'
-                  : 'text-nocturne-grey hover:text-nocturne-ivory'
+                  ? 'bg-[#1A2332] text-[#F2F4F8] font-medium'
+                  : 'text-[#96A0B0] hover:text-[#F2F4F8]'
               }`}
             >
-              <Code className="w-3.5 h-3.5" /> Standard
+              <Code className="w-3.5 h-3.5" /> Source
             </button>
             <button
               onClick={() => setViewMode('diff')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer ${
                 viewMode === 'diff'
-                  ? 'bg-nocturne-charcoal text-nocturne-ivory font-semibold'
-                  : 'text-nocturne-grey hover:text-nocturne-ivory'
+                  ? 'bg-[#1A2332] text-[#F2F4F8] font-medium'
+                  : 'text-[#96A0B0] hover:text-[#F2F4F8]'
               }`}
             >
-              <Split className="w-3.5 h-3.5" /> AI Diff
+              <Split className="w-3.5 h-3.5" /> Diff
             </button>
           </div>
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-nocturne-plum border border-nocturne-border text-xs text-nocturne-grey hover:text-nocturne-ivory hover:border-nocturne-borderSubtle transition-all cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#161B22] border border-[#2E3643] text-xs text-[#96A0B0] hover:text-[#F2F4F8] hover:border-[#3E495B] transition-colors cursor-pointer"
             title="Copy file contents"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-[#2D6A4F]" /> : <Copy className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline font-mono">{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
@@ -132,7 +132,7 @@ export const CodeViewer: React.FC<Props> = ({
 
       {/* Editor Body */}
       {viewMode === 'standard' ? (
-        <div className="font-mono text-xs overflow-x-auto max-h-[620px] overflow-y-auto bg-[#0C0A0D]">
+        <div className="font-mono text-xs overflow-x-auto max-h-[620px] overflow-y-auto bg-[#0C0F14]">
           <div className="min-w-full inline-block py-2">
             {lines.map((lineContent, index) => {
               const lineNum = index + 1;
@@ -141,22 +141,22 @@ export const CodeViewer: React.FC<Props> = ({
               const isExpandedAnnotation = expandedAnnotationLine === lineNum;
               const issue = problem ? getIssueForProblem(problem.issueId) : null;
 
-              let lineBg = 'hover:bg-nocturne-wine/40';
+              let lineBg = 'hover:bg-[#161B22]/60';
               let lineIndicator = null;
 
               if (problem?.severity === 'critical') {
-                lineBg = 'bg-red-950/30 border-l-2 border-red-500';
-                lineIndicator = <ShieldAlert className="w-3.5 h-3.5 text-red-400 shrink-0" />;
+                lineBg = 'bg-[#A63232]/10 border-l-2 border-[#A63232]';
+                lineIndicator = <ShieldAlert className="w-3.5 h-3.5 text-[#E06C75] shrink-0" />;
               } else if (problem?.severity === 'high') {
-                lineBg = 'bg-pumpkin/15 border-l-2 border-pumpkin';
-                lineIndicator = <AlertTriangle className="w-3.5 h-3.5 text-pumpkin shrink-0" />;
+                lineBg = 'bg-[#B7791F]/10 border-l-2 border-[#B7791F]';
+                lineIndicator = <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF67] shrink-0" />;
               } else if (problem?.severity === 'medium') {
-                lineBg = 'bg-amber-950/20 border-l-2 border-amber-400';
-                lineIndicator = <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />;
+                lineBg = 'bg-[#C5A059]/10 border-l-2 border-[#C5A059]';
+                lineIndicator = <AlertTriangle className="w-3.5 h-3.5 text-[#C5A059] shrink-0" />;
               }
 
               if (isSelectedIssue) {
-                lineBg += ' ring-1 ring-inset ring-pumpkin/50';
+                lineBg += ' ring-1 ring-inset ring-[#C5A059]/40';
               }
 
               return (
@@ -165,7 +165,7 @@ export const CodeViewer: React.FC<Props> = ({
                     className={`flex items-start px-3 py-0.5 group transition-colors select-text ${lineBg}`}
                   >
                     {/* Line number */}
-                    <span className="w-10 shrink-0 text-right pr-4 text-[#7E7375] select-none text-[11px]">
+                    <span className="w-10 shrink-0 text-right pr-4 text-[#687487] select-none text-[11px]">
                       {lineNum}
                     </span>
 
@@ -174,60 +174,60 @@ export const CodeViewer: React.FC<Props> = ({
                       {lineIndicator ? (
                         <button
                           onClick={() => setExpandedAnnotationLine(isExpandedAnnotation ? null : lineNum)}
-                          className="hover:scale-125 transition-transform cursor-pointer"
-                          title="Click to view AI annotation"
+                          className="hover:scale-110 transition-transform cursor-pointer"
+                          title="View finding annotation"
                         >
                           {lineIndicator}
                         </button>
                       ) : null}
                     </span>
 
-                    {/* Code line content with crisp text */}
-                    <pre className="flex-1 font-mono text-[12px] text-[#F0EBE1] whitespace-pre pl-1 leading-relaxed">
+                    {/* Code line content */}
+                    <pre className="flex-1 font-mono text-[12px] text-[#F2F4F8] whitespace-pre pl-1 leading-relaxed">
                       {lineContent || ' '}
                     </pre>
                   </div>
 
                   {/* Inline AI Annotation Drawer */}
                   {problem && isExpandedAnnotation && issue && (
-                    <div className="mx-6 my-2 p-4 rounded-xl bg-nocturne-plum border border-nocturne-border shadow-card space-y-3 font-sans">
-                      <div className="flex items-center justify-between border-b border-nocturne-border pb-2">
+                    <div className="mx-6 my-2 p-4 rounded bg-[#161B22] border border-[#2E3643] shadow-sm space-y-3 font-sans">
+                      <div className="flex items-center justify-between border-b border-[#2E3643] pb-2">
                         <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-mono uppercase tracking-wider font-bold px-2 py-0.5 rounded border ${
+                          <span className={`text-[10px] font-mono uppercase tracking-wider font-semibold px-2 py-0.5 rounded border ${
                             problem.severity === 'critical'
-                              ? 'bg-red-950/40 text-red-400 border-red-900/40'
-                              : 'bg-pumpkin/15 text-pumpkin border-pumpkin/30'
+                              ? 'bg-[#A63232]/15 text-[#E06C75] border-[#A63232]/35'
+                              : 'bg-[#B7791F]/15 text-[#D4AF67] border-[#B7791F]/35'
                           }`}>
                             {problem.severity}
                           </span>
-                          <span className="text-xs font-bold text-nocturne-ivory">
+                          <span className="text-xs font-serif font-medium text-[#F2F4F8]">
                             {issue.title}
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono text-nocturne-grey">
-                          Qwen2.5-Coder Flagged at Line {lineNum}
+                        <span className="text-[10px] font-mono text-[#96A0B0]">
+                          Line {lineNum} Flagged
                         </span>
                       </div>
 
-                      <p className="text-xs text-nocturne-grey leading-relaxed font-sans">
+                      <p className="text-xs text-[#96A0B0] leading-relaxed font-sans">
                         {issue.whyItIsAProblem}
                       </p>
 
-                      <div className="bg-[#0F1C16] p-3 rounded-lg border border-emerald-900/40">
-                        <div className="flex items-center justify-between text-[11px] font-mono text-emerald-300 mb-1.5">
-                          <span className="flex items-center gap-1 font-bold">
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Suggested Inline Replacement:
+                      <div className="bg-[#0F1A15] p-3 rounded border border-[#2D6A4F]/30">
+                        <div className="flex items-center justify-between text-[11px] font-mono text-[#4EAA78] mb-1.5">
+                          <span className="flex items-center gap-1 font-semibold">
+                            <Sparkles className="w-3.5 h-3.5 text-[#4EAA78]" /> Suggested Inline Replacement:
                           </span>
                           {onApplyFix && (
                             <button
                               onClick={() => onApplyFix(issue.id)}
-                              className="text-white font-semibold flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1 rounded transition-colors cursor-pointer text-xs"
+                              className="text-[#0E1116] font-semibold flex items-center gap-1 bg-[#2D6A4F] hover:bg-[#387F60] text-white px-2.5 py-0.5 rounded transition-colors cursor-pointer text-xs"
                             >
                               <CheckCheck className="w-3 h-3" /> Apply Fix
                             </button>
                           )}
                         </div>
-                        <pre className="text-[11px] font-mono text-emerald-200 whitespace-pre overflow-x-auto">
+                        <pre className="text-[11px] font-mono text-[#BCEAD0] whitespace-pre overflow-x-auto">
                           {issue.suggestedFixSnippet}
                         </pre>
                       </div>
@@ -239,58 +239,58 @@ export const CodeViewer: React.FC<Props> = ({
           </div>
         </div>
       ) : (
-        /* AI Diff Mode */
-        <div className="p-4 space-y-4 max-h-[600px] overflow-y-auto bg-[#0C0A0D]">
-          <div className="p-3 rounded-lg bg-nocturne-plum border border-nocturne-border text-xs text-nocturne-ivory flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-pumpkin shrink-0" />
+        /* Unified Diff Mode */
+        <div className="p-4 space-y-4 max-h-[600px] overflow-y-auto bg-[#0C0F14]">
+          <div className="p-3 rounded bg-[#161B22] border border-[#2E3643] text-xs text-[#F2F4F8] flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#C5A059] shrink-0" />
             <span>
-              <strong>Qwen2.5-Coder Unified Diff View:</strong> Comparing original code with AI-recommended patches for <strong>{activeFile.filename}</strong>.
+              <strong>Unified Diff Inspection:</strong> Comparing original code with AI-recommended patch for <strong>{activeFile.filename}</strong>.
             </span>
           </div>
 
           {issues.filter(i => i.file === activeFile.filename).length === 0 ? (
-            <div className="p-6 text-center text-nocturne-grey font-mono text-xs">
+            <div className="p-6 text-center text-[#96A0B0] font-mono text-xs">
               No code issues flagged in this file. File passes clean.
             </div>
           ) : (
             issues
               .filter(i => i.file === activeFile.filename)
               .map((issue) => (
-                <div key={issue.id} className="rounded-xl border border-nocturne-border overflow-hidden bg-nocturne-plum shadow-card">
-                  <div className="p-3 bg-nocturne-charcoal/80 border-b border-nocturne-border flex items-center justify-between">
+                <div key={issue.id} className="rounded border border-[#2E3643] overflow-hidden bg-[#161B22]">
+                  <div className="p-3 bg-[#1D232C] border-b border-[#2E3643] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-nocturne-ivory">{issue.title}</span>
-                      <span className="text-[11px] font-mono text-nocturne-grey">
+                      <span className="text-xs font-serif font-medium text-[#F2F4F8]">{issue.title}</span>
+                      <span className="text-[11px] font-mono text-[#96A0B0]">
                         Lines {issue.lineStart} - {issue.lineEnd}
                       </span>
                     </div>
                     {onApplyFix && issue.status !== 'addressed' && (
                       <button
                         onClick={() => onApplyFix(issue.id)}
-                        className="flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1A2332] border border-[#2E3643] text-[#F2F4F8] text-xs font-medium hover:bg-[#233045] transition-colors cursor-pointer"
                       >
-                        <CheckCheck className="w-3.5 h-3.5" /> Apply Patch
+                        <CheckCheck className="w-3.5 h-3.5 text-[#C5A059]" /> Apply Patch
                       </button>
                     )}
                   </div>
 
                   <div className="font-mono text-xs">
                     {/* Vulnerable Original */}
-                    <div className="bg-[#1C1215] border-b border-red-900/40 p-3">
-                      <div className="text-[10px] text-red-400 font-bold uppercase tracking-wider mb-1">
+                    <div className="bg-[#1A1215] border-b border-[#2E3643] p-3">
+                      <div className="text-[10px] text-[#E06C75] font-semibold uppercase tracking-wider mb-1">
                         - Vulnerable Implementation
                       </div>
-                      <pre className="whitespace-pre overflow-x-auto text-[11px] text-red-200">
+                      <pre className="whitespace-pre overflow-x-auto text-[11px] text-[#F2B5BC]">
                         {issue.originalSnippet}
                       </pre>
                     </div>
 
                     {/* AI Fix */}
-                    <div className="bg-[#0F1C16] p-3">
-                      <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1">
-                        + Qwen2.5-Coder Recommended Fix
+                    <div className="bg-[#0F1A15] p-3">
+                      <div className="text-[10px] text-[#4EAA78] font-semibold uppercase tracking-wider mb-1">
+                        + Recommended Fix
                       </div>
-                      <pre className="whitespace-pre overflow-x-auto text-[11px] text-emerald-200">
+                      <pre className="whitespace-pre overflow-x-auto text-[11px] text-[#BCEAD0]">
                         {issue.suggestedFixSnippet}
                       </pre>
                     </div>
@@ -302,7 +302,7 @@ export const CodeViewer: React.FC<Props> = ({
       )}
 
       {/* Footer Info */}
-      <div className="bg-nocturne-charcoal/70 border-t border-nocturne-border px-4 py-2 flex items-center justify-between text-xs font-mono text-nocturne-grey">
+      <div className="bg-[#1D232C] border-t border-[#2E3643] px-4 py-2 flex items-center justify-between text-xs font-mono text-[#96A0B0]">
         <div className="flex items-center gap-3">
           <span>{lines.length} lines</span>
           <span>•</span>

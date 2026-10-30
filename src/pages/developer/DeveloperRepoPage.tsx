@@ -10,18 +10,18 @@ export const DeveloperRepoPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-nocturne-ivory tracking-tight flex items-center gap-2">
-            <FolderGit2 className="w-5 h-5 text-pumpkin" />
+          <h1 className="text-xl sm:text-2xl font-serif font-normal text-[#F2F4F8] tracking-tight flex items-center gap-2.5">
+            <FolderGit2 className="w-5 h-5 text-editorial-brass" />
             Connected Developer Repositories
           </h1>
-          <p className="text-xs text-nocturne-grey mt-1">
-            Repositories with active automated Qwen2.5-Coder review hooks and webhook triggers.
+          <p className="text-xs text-editorial-slate mt-1">
+            Repositories configured with automated Qwen2.5-Coder review hooks and webhook triggers.
           </p>
         </div>
 
         <Link
           to="/repositories"
-          className="px-3.5 py-2 rounded-lg bg-pumpkin hover:bg-pumpkin-dark text-nocturne-bg text-xs font-semibold shadow-card transition-all inline-flex items-center gap-1.5"
+          className="px-3.5 py-2 rounded bg-editorial-brass hover:bg-editorial-brass/90 text-editorial-bg text-xs font-semibold shadow-editorial-card transition-editorial inline-flex items-center gap-1.5 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Connect New Repository</span>
@@ -32,50 +32,50 @@ export const DeveloperRepoPage: React.FC = () => {
         {repositories.map((repo) => (
           <div
             key={repo.id}
-            className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card space-y-4 flex flex-col justify-between hover:border-nocturne-borderSubtle transition-all"
+            className="bg-editorial-surface border border-editorial-border rounded-md p-5 shadow-editorial-card space-y-4 flex flex-col justify-between hover:border-editorial-border/90 hover:bg-editorial-subtle/30 transition-editorial"
           >
             <div>
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-nocturne-ivory font-mono">{repo.name}</h3>
-                  <span className="text-[11px] text-nocturne-grey font-mono">{repo.fullName}</span>
+                  <h3 className="text-sm font-mono font-medium text-[#F2F4F8]">{repo.name}</h3>
+                  <span className="text-[11px] text-editorial-muted font-mono">{repo.fullName}</span>
                 </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-nocturne-charcoal border border-nocturne-border text-nocturne-ivory">
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-editorial-subtle border border-editorial-border text-editorial-slate">
                   {repo.language}
                 </span>
               </div>
 
-              <p className="text-xs text-nocturne-grey mt-2 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-editorial-slate mt-2 line-clamp-2 leading-relaxed font-sans">
                 {repo.description}
               </p>
 
               <div className="grid grid-cols-2 gap-2 mt-4 text-xs font-mono">
-                <div className="p-2 rounded bg-nocturne-charcoal border border-nocturne-border">
-                  <span className="text-nocturne-grey text-[10px] block">Default Branch</span>
-                  <span className="text-nocturne-ivory font-semibold flex items-center gap-1">
-                    <GitBranch className="w-3 h-3 text-tobacco" /> {repo.defaultBranch}
+                <div className="p-2 rounded bg-editorial-subtle/40 border border-editorial-border">
+                  <span className="text-editorial-muted text-[10px] block uppercase tracking-wider">Default Branch</span>
+                  <span className="text-[#F2F4F8] font-medium flex items-center gap-1.5 mt-0.5">
+                    <GitBranch className="w-3 h-3 text-editorial-brass" /> {repo.defaultBranch}
                   </span>
                 </div>
-                <div className="p-2 rounded bg-nocturne-charcoal border border-nocturne-border">
-                  <span className="text-nocturne-grey text-[10px] block">Active PRs</span>
-                  <span className="text-pumpkin font-bold">{repo.activePrsCount}</span>
+                <div className="p-2 rounded bg-editorial-subtle/40 border border-editorial-border">
+                  <span className="text-editorial-muted text-[10px] block uppercase tracking-wider">Active PRs</span>
+                  <span className="text-editorial-brass font-medium mt-0.5 block">{repo.activePrsCount}</span>
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-nocturne-border flex items-center justify-between text-xs">
+            <div className="pt-3 border-t border-editorial-border flex items-center justify-between text-xs">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={repo.autoReviewEnabled}
                   onChange={() => toggleAutoReview(repo.id)}
-                  className="rounded border-nocturne-border text-pumpkin focus:ring-0 w-3.5 h-3.5"
+                  className="rounded border-editorial-border text-editorial-brass focus:ring-0 w-3.5 h-3.5 cursor-pointer"
                 />
-                <span className="text-nocturne-ivory font-mono text-[11px]">Auto AI Review</span>
+                <span className="text-[#F2F4F8] font-mono text-[11px]">Auto AI Review</span>
               </label>
 
-              <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>
+              <span className="text-[11px] font-mono text-editorial-ivy flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-editorial-ivy"></span>
                 Webhook Active
               </span>
             </div>

@@ -15,29 +15,29 @@ export const StatusBadge: React.FC<Props> = ({ status, size = 'md' }) => {
     animate?: boolean;
   }> = {
     ai_reviewing: {
-      label: 'AI Reviewing...',
-      bg: 'bg-wine-900/40 text-pumpkin border-wine-700/40',
+      label: 'AI Pre-screening...',
+      bg: 'bg-[#1A2332] text-[#C5A059] border-[#2E3643]',
       icon: Loader2,
       animate: true,
     },
     ai_completed: {
-      label: 'AI Analysis Ready',
-      bg: 'bg-gold/10 text-gold border-gold/30',
+      label: 'Analysis Ready',
+      bg: 'bg-[#C5A059]/10 text-[#C5A059] border-[#C5A059]/30',
       icon: GitPullRequest,
     },
     changes_requested: {
       label: 'Changes Requested',
-      bg: 'bg-pumpkin-dark/20 text-pumpkin border-pumpkin/30',
+      bg: 'bg-[#B7791F]/15 text-[#D4AF67] border-[#B7791F]/35',
       icon: AlertOctagon,
     },
     approved: {
       label: 'Approved',
-      bg: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40',
+      bg: 'bg-[#2D6A4F]/15 text-[#4EAA78] border-[#2D6A4F]/35',
       icon: CheckCircle2,
     },
     merged: {
       label: 'Merged',
-      bg: 'bg-nocturne-charcoal text-nocturne-grey border-nocturne-border',
+      bg: 'bg-[#1D232C] text-[#96A0B0] border-[#2E3643]',
       icon: GitMerge,
     },
   };
@@ -46,16 +46,16 @@ export const StatusBadge: React.FC<Props> = ({ status, size = 'md' }) => {
   const Icon = config.icon;
 
   const sizeClasses = {
-    sm: 'text-[11px] px-2 py-0.5 gap-1',
-    md: 'text-xs px-2.5 py-1 gap-1.5',
-    lg: 'text-xs px-3 py-1.5 gap-2 font-medium',
+    sm: 'text-[10px] px-2 py-0.5 gap-1 font-mono uppercase tracking-wider',
+    md: 'text-xs px-2.5 py-0.5 gap-1.5 font-mono tracking-wide',
+    lg: 'text-xs px-3 py-1 gap-2 font-medium font-sans',
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-md border font-medium tracking-tight ${config.bg} ${sizeClasses[size]}`}
+      className={`inline-flex items-center rounded border font-medium ${config.bg} ${sizeClasses[size]}`}
     >
-      <Icon className={`w-3.5 h-3.5 shrink-0 ${config.animate ? 'animate-spin text-pumpkin' : ''}`} />
+      <Icon className={`w-3 h-3 shrink-0 ${config.animate ? 'animate-spin text-[#C5A059]' : ''}`} />
       <span>{config.label}</span>
     </span>
   );

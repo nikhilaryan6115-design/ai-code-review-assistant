@@ -26,20 +26,20 @@ export const NotificationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-nocturne-ivory tracking-tight flex items-center gap-2">
-            <Bell className="w-5 h-5 text-pumpkin" />
+          <h1 className="text-xl sm:text-2xl font-serif font-normal text-[#F2F4F8] tracking-tight flex items-center gap-2.5">
+            <Bell className="w-5 h-5 text-editorial-brass" />
             Notifications & System Alerts
           </h1>
-          <p className="text-xs text-nocturne-grey mt-1">
+          <p className="text-xs text-editorial-slate mt-1">
             Real-time feed of automated Qwen2.5-Coder detections, manager review sign-offs, and webhook dispatches.
           </p>
         </div>
 
         <button
           onClick={markAllNotificationsRead}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-nocturne-plum border border-nocturne-border text-xs font-mono text-nocturne-ivory hover:bg-nocturne-wine transition-colors shadow-card"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-editorial-surface border border-editorial-border text-xs font-mono text-[#F2F4F8] hover:bg-editorial-subtle transition-editorial shadow-editorial-card cursor-pointer"
         >
-          <CheckCheck className="w-4 h-4 text-pumpkin" />
+          <CheckCheck className="w-4 h-4 text-editorial-brass" />
           <span>Mark all as read</span>
         </button>
       </div>
@@ -48,24 +48,24 @@ export const NotificationsPage: React.FC = () => {
       <div className="flex items-center gap-2 text-xs font-mono">
         <button
           onClick={() => setFilterType('all')}
-          className={`px-3 py-1.5 rounded-md transition-colors ${
-            filterType === 'all' ? 'bg-pumpkin text-nocturne-bg font-semibold' : 'bg-nocturne-plum text-nocturne-grey hover:text-nocturne-ivory border border-nocturne-border'
+          className={`px-3 py-1.5 rounded transition-editorial cursor-pointer ${
+            filterType === 'all' ? 'bg-editorial-navy text-[#F2F4F8] font-medium border border-editorial-border' : 'bg-editorial-surface text-editorial-muted hover:text-[#F2F4F8] border border-editorial-border'
           }`}
         >
           All ({notifications.length})
         </button>
         <button
           onClick={() => setFilterType('unread')}
-          className={`px-3 py-1.5 rounded-md transition-colors ${
-            filterType === 'unread' ? 'bg-pumpkin text-nocturne-bg font-semibold' : 'bg-nocturne-plum text-nocturne-grey hover:text-nocturne-ivory border border-nocturne-border'
+          className={`px-3 py-1.5 rounded transition-editorial cursor-pointer ${
+            filterType === 'unread' ? 'bg-editorial-brass text-editorial-bg font-semibold border border-editorial-brass' : 'bg-editorial-surface text-editorial-muted hover:text-[#F2F4F8] border border-editorial-border'
           }`}
         >
           Unread ({notifications.filter(n => !n.read).length})
         </button>
         <button
           onClick={() => setFilterType('critical')}
-          className={`px-3 py-1.5 rounded-md transition-colors ${
-            filterType === 'critical' ? 'bg-red-800 text-white font-bold' : 'bg-nocturne-plum text-red-400 hover:bg-red-950/40 border border-red-900/40'
+          className={`px-3 py-1.5 rounded transition-editorial cursor-pointer ${
+            filterType === 'critical' ? 'bg-editorial-crimson/20 text-editorial-crimson font-medium border border-editorial-crimson/40' : 'bg-editorial-surface text-editorial-crimson/80 hover:text-editorial-crimson border border-editorial-border'
           }`}
         >
           Critical Vulnerabilities
@@ -73,9 +73,9 @@ export const NotificationsPage: React.FC = () => {
       </div>
 
       {/* List */}
-      <div className="bg-nocturne-plum border border-nocturne-border rounded-xl divide-y divide-nocturne-border/60 overflow-hidden shadow-card">
+      <div className="bg-editorial-surface border border-editorial-border rounded-md divide-y divide-editorial-border overflow-hidden shadow-editorial-card">
         {filteredNotifs.length === 0 ? (
-          <div className="p-8 text-center text-nocturne-grey text-xs font-mono">
+          <div className="p-8 text-center text-editorial-muted text-xs font-mono">
             No notifications found in this category.
           </div>
         ) : (
@@ -88,42 +88,42 @@ export const NotificationsPage: React.FC = () => {
                   navigate(`/manager/reviews/${notif.submissionId}`);
                 }
               }}
-              className={`p-4 hover:bg-nocturne-charcoal transition-colors cursor-pointer flex items-start gap-3.5 ${
-                !notif.read ? 'bg-nocturne-charcoal/25' : ''
+              className={`p-4 hover:bg-editorial-subtle/50 transition-editorial cursor-pointer flex items-start gap-3.5 ${
+                !notif.read ? 'bg-editorial-subtle/25' : ''
               }`}
             >
               {/* Type icon */}
-              <div className="p-2 rounded-lg bg-nocturne-charcoal border border-nocturne-border shrink-0 mt-0.5">
+              <div className="p-2 rounded bg-editorial-subtle border border-editorial-border shrink-0 mt-0.5">
                 {notif.type === 'critical' ? (
-                  <ShieldAlert className="w-4 h-4 text-red-400" />
+                  <ShieldAlert className="w-4 h-4 text-editorial-crimson" />
                 ) : notif.type === 'warning' ? (
-                  <Sparkles className="w-4 h-4 text-pumpkin" />
+                  <Sparkles className="w-4 h-4 text-editorial-ochre" />
                 ) : (
-                  <ShieldCheck className="w-4 h-4 text-pumpkin" />
+                  <ShieldCheck className="w-4 h-4 text-editorial-ivy" />
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h4 className={`text-xs ${!notif.read ? 'font-bold text-nocturne-ivory' : 'font-semibold text-nocturne-ivory'}`}>
+                  <h4 className={`text-xs ${!notif.read ? 'font-serif font-medium text-[#F2F4F8]' : 'font-serif text-[#F2F4F8]/80'}`}>
                     {notif.title}
                   </h4>
-                  <span className="text-[10px] font-mono text-nocturne-grey">
+                  <span className="text-[10px] font-mono text-editorial-muted">
                     {notif.timestamp}
                   </span>
                 </div>
-                <p className="text-xs text-nocturne-grey mt-1 leading-relaxed">
+                <p className="text-xs text-editorial-slate mt-1 leading-relaxed font-sans">
                   {notif.message}
                 </p>
                 {notif.prNumber && (
-                  <span className="inline-block mt-2 text-[11px] font-mono text-pumpkin hover:underline font-medium">
+                  <span className="inline-block mt-2 text-[11px] font-mono text-editorial-brass hover:underline font-medium">
                     Inspect Pull Request #{notif.prNumber} →
                   </span>
                 )}
               </div>
 
               {!notif.read && (
-                <div className="w-2 h-2 rounded-full bg-wine shrink-0 mt-2" />
+                <div className="w-2 h-2 rounded-full bg-editorial-brass shrink-0 mt-2" />
               )}
             </div>
           ))

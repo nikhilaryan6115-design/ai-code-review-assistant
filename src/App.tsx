@@ -45,11 +45,11 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-nocturne-bg text-nocturne-ivory flex flex-col font-sans selection:bg-nocturne-charcoal selection:text-pumpkin">
+    <div className="min-h-screen bg-editorial-bg text-[#F2F4F8] flex flex-col font-sans selection:bg-editorial-brass selection:text-editorial-bg">
       <Navbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 max-w-[1560px] mx-auto w-full">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-[1560px] mx-auto w-full">
           <AnimatePresence mode="wait">
             <PageWrapper key={location.pathname}>
               <Outlet />

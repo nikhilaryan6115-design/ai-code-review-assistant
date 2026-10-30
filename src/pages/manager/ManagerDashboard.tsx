@@ -10,9 +10,6 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   ArrowRight,
-  ShieldCheck,
-  AlertTriangle,
-  Flame,
   ChevronRight
 } from 'lucide-react';
 import { 
@@ -27,15 +24,14 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import { PumpkinSVG, SmallPumpkinSVG } from '../../components/halloween/PumpkinSVG';
 import { RunningPumpkinCharge } from '../../components/halloween/RunningPumpkinCharge';
 
 export const ManagerDashboard: React.FC = () => {
   const { submissions, currentUser } = useApp();
   const navigate = useNavigate();
   const [isCharging, setIsCharging] = useState(false);
-  const pumpkinRef = useRef<HTMLDivElement>(null);
-  const [pumpkinRect, setPumpkinRect] = useState<DOMRect | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [triggerRect, setTriggerRect] = useState<DOMRect | null>(null);
 
   // Metrics
   const totalSubmissions = submissions.length + 120;
@@ -60,19 +56,18 @@ export const ManagerDashboard: React.FC = () => {
   ];
 
   const severityData = [
-    { name: 'Critical', count: 18, color: '#DC2626' },
-    { name: 'High', count: 27, color: '#E87927' },
-    { name: 'Medium', count: 46, color: '#C5A36B' },
-    { name: 'Low', count: 82, color: '#524554' },
+    { name: 'Critical', count: 18, color: '#A63232' },
+    { name: 'High', count: 27, color: '#B7791F' },
+    { name: 'Medium', count: 46, color: '#C5A059' },
+    { name: 'Low', count: 82, color: '#4E5A6C' },
   ];
 
-  // Signature interaction trigger
   const handleReviewPendingClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isCharging) return;
 
-    if (pumpkinRef.current) {
-      setPumpkinRect(pumpkinRef.current.getBoundingClientRect());
+    if (triggerRef.current) {
+      setTriggerRect(triggerRef.current.getBoundingClientRect());
     }
     setIsCharging(true);
   };
@@ -83,94 +78,87 @@ export const ManagerDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Signature Running Pumpkin Screen Charge Overlay */}
+      {/* Retained interaction overlay with tasteful transition */}
       <RunningPumpkinCharge 
         isActive={isCharging}
         onComplete={handleChargeComplete}
-        startRect={pumpkinRect}
+        startRect={triggerRect}
       />
 
-      {/* A. Refined Human-Crafted Welcome Hero Banner */}
-      <div className="relative bg-nocturne-plum border border-nocturne-border rounded-xl p-6 sm:p-7 overflow-hidden">
-        {/* Subtle dark burgundy background depth */}
-        <div className="absolute inset-0 bg-gradient-to-r from-wine-900/25 via-nocturne-plum to-nocturne-plum pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          {/* Left info column */}
-          <div className="space-y-3.5 max-w-2xl">
+      {/* A. Editorial Executive Overview Banner */}
+      <div className="bg-[#161B22] border border-[#2E3643] rounded p-6 sm:p-8">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          {/* Left summary */}
+          <div className="space-y-3 max-w-2xl">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium bg-nocturne-charcoal border border-nocturne-border text-pumpkin">
-                <span className="w-1.5 h-1.5 rounded-full bg-pumpkin animate-pulse" />
-                Engineering Command
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-widest bg-[#1D232C] border border-[#2E3643] text-[#C5A059] font-medium">
+                Executive Command
               </span>
-              <span className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-0.5 rounded-full bg-nocturne-wine border border-nocturne-border text-nocturne-grey">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                Qwen2.5-Coder 7B Online
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded bg-[#1D232C] border border-[#2E3643] text-[#96A0B0]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
+                Qwen2.5-Coder 7B Engine
               </span>
             </div>
 
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-nocturne-ivory tracking-tight font-heading">
-                Welcome back, {currentUser.name.split(' ')[0]}
+              <h1 className="text-2xl sm:text-3xl font-serif font-medium text-[#F2F4F8] tracking-tight">
+                Review Overview & Sign-off Queue
               </h1>
-              <p className="text-sm text-nocturne-grey mt-1 font-sans leading-relaxed">
-                RevAI has screened your incoming pull requests with AST analysis and OWASP security rules before manual review.
+              <p className="text-sm text-[#96A0B0] mt-1 font-sans leading-relaxed">
+                Automated pre-screening has evaluated incoming pull requests with static AST analysis and OWASP compliance rules.
               </p>
             </div>
 
-            {/* Quick summary metrics */}
-            <div className="flex items-center gap-4 text-xs font-mono text-nocturne-grey pt-1">
+            {/* Metrics ticker */}
+            <div className="flex items-center gap-4 text-xs font-mono text-[#96A0B0] pt-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-pumpkin font-semibold text-sm">{pendingReviews}</span>
+                <span className="text-[#C5A059] font-semibold text-sm">{pendingReviews}</span>
                 <span>pending sign-offs</span>
               </div>
-              <span className="text-nocturne-border">•</span>
+              <span className="text-[#2E3643]">•</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-red-400 font-semibold text-sm">{criticalIssues}</span>
+                <span className="text-[#E06C75] font-semibold text-sm">{criticalIssues}</span>
                 <span>critical vulnerabilities</span>
               </div>
-              <span className="text-nocturne-border">•</span>
+              <span className="text-[#2E3643]">•</span>
               <div className="flex items-center gap-1.5">
-                <span className="text-emerald-400 font-semibold text-sm">14s</span>
-                <span>avg review time</span>
+                <span className="text-[#4EAA78] font-semibold text-sm">14s</span>
+                <span>avg inspection latency</span>
               </div>
             </div>
 
             {/* Action buttons */}
-            <div className="pt-2 flex items-center gap-3">
+            <div className="pt-2 flex items-center gap-3" ref={triggerRef}>
               <button
                 type="button"
                 onClick={handleReviewPendingClick}
                 disabled={isCharging}
-                className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-lg bg-pumpkin hover:bg-pumpkin-dark text-nocturne-bg font-semibold text-xs tracking-wide transition-all shadow-card hover:shadow-card-hover active:scale-[0.98] disabled:opacity-75 cursor-pointer"
-                title="Click to trigger the review flow and signature pumpkin interaction"
+                className="group inline-flex items-center gap-2 px-5 py-2.5 rounded bg-[#C5A059] hover:bg-[#D4AF67] text-[#0E1116] font-medium text-xs tracking-wide transition-colors shadow-sm disabled:opacity-75 cursor-pointer"
+                title="Navigate to pending pull requests"
               >
-                <span>{isCharging ? 'Approaching Submissions...' : `Review Pending PRs (${pendingReviews})`}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                <span>{isCharging ? 'Loading Submissions...' : `Review Pending Queue (${pendingReviews})`}</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
 
               <Link
                 to="/manager/history"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-nocturne-charcoal hover:bg-nocturne-wine border border-nocturne-border text-nocturne-ivory text-xs font-medium transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded bg-[#1D232C] hover:bg-[#252D38] border border-[#2E3643] text-[#F2F4F8] text-xs font-medium transition-colors"
               >
-                <span>Audit History</span>
+                <span>Inspection Audit Log</span>
               </Link>
             </div>
           </div>
 
-          {/* Right: The Realistic Pumpkin Illustration (Interactive trigger) */}
-          <div 
-            ref={pumpkinRef}
-            onClick={handleReviewPendingClick}
-            className="cursor-pointer group flex flex-col items-center justify-center p-3 rounded-xl bg-nocturne-wine/40 border border-nocturne-border hover:border-pumpkin/40 transition-all shrink-0 self-center lg:self-auto"
-            title="Click pumpkin or Review button to initiate review charge"
-          >
-            <div className="transition-transform group-hover:scale-105 duration-200">
-              <PumpkinSVG size={110} glow={true} />
-            </div>
-            <span className="text-[10px] font-mono text-nocturne-grey/80 mt-1 flex items-center gap-1 group-hover:text-pumpkin transition-colors">
-              <Flame className="w-3 h-3 text-pumpkin" />
-              Click to launch review
+          {/* Right badge */}
+          <div className="hidden lg:flex flex-col items-end justify-center pr-4 text-right">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#687487] block">
+              Automated Coverage
+            </span>
+            <span className="font-serif text-2xl text-[#F2F4F8] mt-0.5 block">
+              94.2% Pass Rate
+            </span>
+            <span className="text-xs text-[#96A0B0] font-sans mt-1 max-w-[200px]">
+              Catching flaws before manual manager sign-offs
             </span>
           </div>
         </div>
@@ -183,34 +171,34 @@ export const ManagerDashboard: React.FC = () => {
           value={totalSubmissions}
           change="+18% this month"
           isPositive={true}
-          subtitle="6 monitored services"
+          subtitle="6 monitored repositories"
           icon={GitPullRequest}
           badge="Lifetime"
         />
         <StatCard
-          title="Pending Reviews"
+          title="Pending Sign-Offs"
           value={pendingReviews}
-          change="Requires manager sign-off"
+          change="Requires manager triage"
           isPositive={false}
-          subtitle="Active queue"
+          subtitle="Awaiting authorization"
           icon={Clock}
-          badge="In Triage"
+          badge="In Queue"
         />
         <StatCard
-          title="Critical Issues Caught"
+          title="Vulnerabilities Caught"
           value={criticalIssues}
-          change="Intercepted pre-merge"
+          change="Pre-merge detection"
           isPositive={false}
-          subtitle="SQLi, XSS, token leaks"
+          subtitle="AST security rules"
           icon={ShieldAlert}
-          badge="OWASP AST"
+          badge="OWASP 2026"
         />
         <StatCard
           title="Verified Approvals"
           value={completedReviews}
-          change="94.2% acceptance rate"
+          change="94.2% first-pass accuracy"
           isPositive={true}
-          subtitle="No regressions reported"
+          subtitle="Zero regression rollback"
           icon={CheckCircle2}
           badge="Verified"
         />
@@ -219,24 +207,24 @@ export const ManagerDashboard: React.FC = () => {
       {/* C & D. Throughput Charts & AI Severity Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Throughput Chart */}
-        <div className="lg:col-span-2 bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4 border-b border-nocturne-border pb-3">
+        <div className="lg:col-span-2 bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-4 border-b border-[#2E3643] pb-3">
             <div>
-              <h2 className="text-sm font-bold text-nocturne-ivory font-heading">
-                Weekly Review Throughput
+              <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">
+                Weekly Throughput Ledger
               </h2>
-              <p className="text-xs text-nocturne-grey mt-0.5">
-                Automated AI screening vs verified engineering sign-offs
+              <p className="text-xs text-[#96A0B0] mt-0.5">
+                Automated AI screening submissions versus verified engineering authorizations
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs font-mono">
-              <div className="flex items-center gap-1.5 text-nocturne-ivory">
-                <span className="w-2.5 h-2.5 rounded bg-wine-700"></span>
+              <div className="flex items-center gap-1.5 text-[#F2F4F8]">
+                <span className="w-2 h-2 rounded bg-[#1A2332] border border-[#2E3643]"></span>
                 <span>Submissions</span>
               </div>
-              <div className="flex items-center gap-1.5 text-nocturne-ivory">
-                <span className="w-2.5 h-2.5 rounded bg-pumpkin"></span>
-                <span>Approved</span>
+              <div className="flex items-center gap-1.5 text-[#F2F4F8]">
+                <span className="w-2 h-2 rounded bg-[#C5A059]"></span>
+                <span>Authorized</span>
               </div>
             </div>
           </div>
@@ -246,61 +234,61 @@ export const ManagerDashboard: React.FC = () => {
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSub" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#592C3B" stopOpacity={0.5} />
-                    <stop offset="95%" stopColor="#592C3B" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#2A384F" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#2A384F" stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id="colorApp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#E87927" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#E87927" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#C5A059" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#C5A059" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2C222E" vertical={false} />
-                <XAxis dataKey="day" stroke="#A1989A" fontSize={11} tickLine={false} />
-                <YAxis stroke="#A1989A" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2E3643" vertical={false} />
+                <XAxis dataKey="day" stroke="#96A0B0" fontSize={11} tickLine={false} />
+                <YAxis stroke="#96A0B0" fontSize={11} tickLine={false} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#17131A',
-                    borderColor: '#2C222E',
-                    borderRadius: '8px',
-                    color: '#F5F2EB',
+                    backgroundColor: '#161B22',
+                    borderColor: '#2E3643',
+                    borderRadius: '4px',
+                    color: '#F2F4F8',
                     fontSize: '12px',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)'
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
                   }}
                 />
-                <Area type="monotone" dataKey="submissions" stroke="#592C3B" strokeWidth={2} fillOpacity={1} fill="url(#colorSub)" />
-                <Area type="monotone" dataKey="approved" stroke="#E87927" strokeWidth={2} fillOpacity={1} fill="url(#colorApp)" />
+                <Area type="monotone" dataKey="submissions" stroke="#4A6184" strokeWidth={1.5} fillOpacity={1} fill="url(#colorSub)" />
+                <Area type="monotone" dataKey="approved" stroke="#C5A059" strokeWidth={1.5} fillOpacity={1} fill="url(#colorApp)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Severity Distribution */}
-        <div className="bg-nocturne-plum border border-nocturne-border rounded-xl p-5 shadow-card flex flex-col justify-between">
+        <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-bold text-nocturne-ivory font-heading">
-              AI Vulnerability Breakdown
+            <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">
+              Vulnerability Distribution
             </h2>
-            <p className="text-xs text-nocturne-grey mt-0.5">
-              Identified security, logic & quality findings
+            <p className="text-xs text-[#96A0B0] mt-0.5">
+              Breakdown by detected risk severity
             </p>
           </div>
 
           <div className="h-44 w-full my-3">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={severityData} layout="vertical" margin={{ top: 5, right: 15, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2C222E" horizontal={false} />
-                <XAxis type="number" stroke="#A1989A" fontSize={11} tickLine={false} />
-                <YAxis type="category" dataKey="name" stroke="#A1989A" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2E3643" horizontal={false} />
+                <XAxis type="number" stroke="#96A0B0" fontSize={11} tickLine={false} />
+                <YAxis type="category" dataKey="name" stroke="#96A0B0" fontSize={11} tickLine={false} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#17131A',
-                    borderColor: '#2C222E',
-                    borderRadius: '8px',
-                    color: '#F5F2EB',
+                    backgroundColor: '#161B22',
+                    borderColor: '#2E3643',
+                    borderRadius: '4px',
+                    color: '#F2F4F8',
                     fontSize: '12px'
                   }}
                 />
-                <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                <Bar dataKey="count" radius={[0, 2, 2, 0]}>
                   {severityData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -309,106 +297,100 @@ export const ManagerDashboard: React.FC = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-nocturne-border text-xs">
-            <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-900/40">
-              <span className="text-red-400 text-[10px] font-mono uppercase font-semibold block">Critical Risks</span>
-              <span className="text-red-300 font-bold text-sm">18 issues</span>
+          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-[#2E3643] text-xs">
+            <div className="p-2.5 rounded bg-[#A63232]/10 border border-[#A63232]/30">
+              <span className="text-[#E06C75] text-[10px] font-mono uppercase tracking-wider font-semibold block">Critical Risks</span>
+              <span className="text-[#F2B5BC] font-serif text-base font-medium">18 findings</span>
             </div>
-            <div className="p-2.5 rounded-lg bg-pumpkin/10 border border-pumpkin/25">
-              <span className="text-pumpkin text-[10px] font-mono uppercase font-semibold block">High Warnings</span>
-              <span className="text-pumpkin font-bold text-sm">27 issues</span>
+            <div className="p-2.5 rounded bg-[#B7791F]/10 border border-[#B7791F]/30">
+              <span className="text-[#D4AF67] text-[10px] font-mono uppercase tracking-wider font-semibold block">High Warnings</span>
+              <span className="text-[#F2E0BE] font-serif text-base font-medium">27 findings</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* E. Recent Submissions Requiring Attention Table */}
-      <div className="bg-nocturne-plum border border-nocturne-border rounded-xl overflow-hidden shadow-card">
-        <div className="p-4 sm:p-5 border-b border-nocturne-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-[#161B22] border border-[#2E3643] rounded overflow-hidden shadow-sm">
+        <div className="p-4 sm:p-5 border-b border-[#2E3643] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2">
-              <SmallPumpkinSVG size={18} />
-              <h2 className="text-sm font-bold text-nocturne-ivory font-heading">
-                Pending Code Submissions
-              </h2>
-            </div>
-            <p className="text-xs text-nocturne-grey mt-0.5">
-              Ranked by risk score and pending status. Click row to inspect findings and code diff.
+            <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">
+              Active Submissions Requiring Attention
+            </h2>
+            <p className="text-xs text-[#96A0B0] mt-0.5">
+              Ranked by pending status and risk score. Select a pull request to inspect diff and automated findings.
             </p>
           </div>
           <Link
             to="/manager/submissions"
-            className="text-xs text-pumpkin hover:text-pumpkin-dark font-medium flex items-center gap-1 transition-colors"
+            className="text-xs text-[#C5A059] hover:underline font-medium flex items-center gap-1 transition-colors"
           >
-            <span>View All PRs ({submissions.length})</span>
+            <span>View Full Queue ({submissions.length})</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-nocturne-charcoal/70 text-nocturne-grey font-mono uppercase tracking-wider text-[11px] border-b border-nocturne-border">
+            <thead className="bg-[#1D232C] text-[#96A0B0] font-mono uppercase tracking-wider text-[10px] border-b border-[#2E3643]">
               <tr>
                 <th className="py-3 px-4 font-medium">Pull Request</th>
                 <th className="py-3 px-4 font-medium">Author</th>
                 <th className="py-3 px-4 font-medium">Repository</th>
                 <th className="py-3 px-4 font-medium">Language</th>
-                <th className="py-3 px-4 font-medium">AI Status</th>
-                <th className="py-3 px-4 font-medium">Risk Score</th>
+                <th className="py-3 px-4 font-medium">Status</th>
+                <th className="py-3 px-4 font-medium">Risk Assessment</th>
                 <th className="py-3 px-4 text-right font-medium">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-nocturne-border text-nocturne-ivory">
+            <tbody className="divide-y divide-[#2E3643] text-[#F2F4F8]">
               {sortedSubmissions.map((sub) => (
                 <tr
                   key={sub.id}
                   onClick={() => navigate(`/manager/reviews/${sub.id}`)}
-                  className="hover:bg-nocturne-wine/40 cursor-pointer transition-colors group"
+                  className="hover:bg-[#1D232C]/60 cursor-pointer transition-colors group"
                 >
-                  <td className="py-3.5 px-4 font-mono">
+                  <td className="py-3 px-4 font-mono">
                     <div className="flex items-center gap-2">
-                      <span className="text-pumpkin font-bold">#{sub.prNumber}</span>
-                      <span className="text-nocturne-ivory font-sans font-medium line-clamp-1 max-w-[220px] lg:max-w-[300px]">
+                      <span className="text-[#C5A059] font-medium">#{sub.prNumber}</span>
+                      <span className="text-[#F2F4F8] font-sans font-medium line-clamp-1 max-w-[220px] lg:max-w-[300px]">
                         {sub.title}
                       </span>
                     </div>
                   </td>
 
-                  <td className="py-3.5 px-4">
+                  <td className="py-3 px-4">
                     <div className="flex items-center gap-2">
                       <img
                         src={sub.developer.avatar}
                         alt={sub.developer.name}
-                        className="w-6 h-6 rounded-full object-cover ring-1 ring-nocturne-border"
+                        className="w-5 h-5 rounded object-cover ring-1 ring-[#2E3643]"
                       />
-                      <span className="font-medium text-nocturne-ivory">{sub.developer.name}</span>
+                      <span className="font-medium text-[#F2F4F8]">{sub.developer.name}</span>
                     </div>
                   </td>
 
-                  <td className="py-3.5 px-4 font-mono text-nocturne-grey">
-                    <span className="px-2 py-0.5 rounded bg-nocturne-charcoal border border-nocturne-border text-[11px] text-nocturne-ivory">
+                  <td className="py-3 px-4 font-mono text-[#96A0B0]">
+                    <span className="px-1.5 py-0.5 rounded bg-[#1D232C] border border-[#2E3643] text-[11px] text-[#F2F4F8]">
                       {sub.repository.name}
                     </span>
                   </td>
 
-                  <td className="py-3.5 px-4 font-mono">
-                    <span className="text-nocturne-grey text-[11px]">
-                      {sub.language}
-                    </span>
+                  <td className="py-3 px-4 font-mono text-[#96A0B0] text-[11px]">
+                    {sub.language}
                   </td>
 
-                  <td className="py-3.5 px-4">
+                  <td className="py-3 px-4">
                     <StatusBadge status={sub.status} size="sm" />
                   </td>
 
-                  <td className="py-3.5 px-4">
+                  <td className="py-3 px-4">
                     <RiskBadge level={sub.riskLevel} score={sub.riskScore} size="sm" />
                   </td>
 
-                  <td className="py-3.5 px-4 text-right">
-                    <span className="inline-flex items-center gap-1 text-xs text-pumpkin font-semibold group-hover:translate-x-0.5 transition-transform">
-                      Review
-                      <ArrowRight className="w-3.5 h-3.5" />
+                  <td className="py-3 px-4 text-right font-mono text-xs">
+                    <span className="text-[#C5A059] group-hover:underline inline-flex items-center gap-1 font-medium">
+                      Review <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </td>
                 </tr>
