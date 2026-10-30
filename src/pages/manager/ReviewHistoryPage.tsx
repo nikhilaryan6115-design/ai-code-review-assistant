@@ -8,11 +8,8 @@ import {
   CheckCircle2, 
   XCircle, 
   Clock, 
-  GitPullRequest, 
-  ArrowRight, 
   Bot, 
-  MessageSquare,
-  Search,
+  ArrowRight,
   Filter
 } from 'lucide-react';
 
@@ -31,43 +28,43 @@ export const ReviewHistoryPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <History className="w-6 h-6 text-brand-blue" />
+          <h1 className="text-xl sm:text-2xl font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
+            <History className="w-5 h-5 text-wine" />
             Code Review Audit & History
           </h1>
-          <p className="text-xs text-dark-muted mt-1">
+          <p className="text-xs text-warm-muted mt-1">
             Complete audit trail of AI automated evaluations, manager sign-offs, and developer feedback threads.
           </p>
         </div>
 
         {/* Filter buttons */}
-        <div className="flex items-center gap-2 bg-dark-card border border-dark-border p-1 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-warm-white border border-warm-border p-1 rounded-lg shadow-warm-sm">
           <button
             onClick={() => setFilterDecision('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'all'
-                ? 'bg-brand-blue text-white font-bold'
-                : 'text-dark-muted hover:text-white'
+                ? 'bg-wine text-white font-semibold'
+                : 'text-warm-muted hover:text-warm-charcoal'
             }`}
           >
             All Logs ({submissions.length})
           </button>
           <button
             onClick={() => setFilterDecision('approved')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'approved'
-                ? 'bg-emerald-600 text-white font-bold'
-                : 'text-dark-muted hover:text-white'
+                ? 'bg-emerald-700 text-white font-semibold'
+                : 'text-warm-muted hover:text-warm-charcoal'
             }`}
           >
             Approved
           </button>
           <button
             onClick={() => setFilterDecision('changes_requested')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               filterDecision === 'changes_requested'
-                ? 'bg-amber-600 text-white font-bold'
-                : 'text-dark-muted hover:text-white'
+                ? 'bg-amber-700 text-white font-semibold'
+                : 'text-warm-muted hover:text-warm-charcoal'
             }`}
           >
             Changes Requested
@@ -76,24 +73,21 @@ export const ReviewHistoryPage: React.FC = () => {
       </div>
 
       {/* History Timeline Cards */}
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {historySubmissions.map((sub) => {
-          const isApproved = sub.status === 'approved' || sub.managerDecision?.decision === 'approved';
-          const isChangesReq = sub.status === 'changes_requested' || sub.managerDecision?.decision === 'changes_requested';
-
           return (
             <div
               key={sub.id}
               onClick={() => navigate(`/manager/reviews/${sub.id}`)}
-              className="bg-dark-card border border-dark-border rounded-2xl p-5 hover:border-dark-borderLight transition-all cursor-pointer shadow-lg space-y-4"
+              className="bg-warm-white border border-warm-border rounded-xl p-5 hover:border-warm-borderStrong transition-all cursor-pointer shadow-warm-sm space-y-3.5"
             >
               {/* Row 1: Top info & status */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-dark-border/60 pb-3">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-brand-blue font-bold text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-warm-border/60 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-wine font-bold text-xs">
                     PR #{sub.prNumber}
                   </span>
-                  <span className="text-white font-semibold text-sm line-clamp-1">
+                  <span className="text-warm-charcoal font-semibold text-sm line-clamp-1">
                     {sub.title}
                   </span>
                 </div>
@@ -110,42 +104,42 @@ export const ReviewHistoryPage: React.FC = () => {
                   <img
                     src={sub.developer.avatar}
                     alt={sub.developer.name}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-warm-border"
                   />
                   <div>
-                    <span className="text-white font-sans font-medium">{sub.developer.name}</span>
-                    <span className="text-dark-dim text-[11px] block">{sub.repository.name}</span>
+                    <span className="text-warm-charcoal font-sans font-medium">{sub.developer.name}</span>
+                    <span className="text-warm-muted text-[11px] block">{sub.repository.name}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-dark-muted">
-                  <Clock className="w-4 h-4 text-brand-blue" />
+                <div className="flex items-center gap-2 text-warm-muted">
+                  <Clock className="w-3.5 h-3.5 text-tobacco" />
                   <span>
                     Submitted: {new Date(sub.submissionDate).toLocaleDateString()}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-dark-muted md:justify-end">
-                  <Bot className="w-4 h-4 text-brand-purpleLight" />
-                  <span>AI Pre-check: {sub.reviewTimeSeconds || 14}s elapsed</span>
+                <div className="flex items-center gap-2 text-warm-muted md:justify-end">
+                  <Bot className="w-3.5 h-3.5 text-wine" />
+                  <span>AI Pre-check: {sub.reviewTimeSeconds || 14}s</span>
                 </div>
               </div>
 
               {/* Row 3: Manager Decision & Feedback */}
               {sub.managerDecision ? (
                 <div
-                  className={`p-3.5 rounded-xl border text-xs ${
+                  className={`p-3 rounded-lg border text-xs ${
                     sub.managerDecision.decision === 'approved'
-                      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
-                      : 'bg-amber-500/10 border-amber-500/20 text-amber-300'
+                      ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+                      : 'bg-amber-50 text-amber-900 border-amber-300'
                   }`}
                 >
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase font-bold mb-1">
                     <span className="flex items-center gap-1.5">
                       {sub.managerDecision.decision === 'approved' ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                       ) : (
-                        <XCircle className="w-3.5 h-3.5 text-amber-400" />
+                        <XCircle className="w-3.5 h-3.5 text-amber-700" />
                       )}
                       Manager Action: {sub.managerDecision.decision.replace('_', ' ')}
                     </span>
@@ -153,15 +147,15 @@ export const ReviewHistoryPage: React.FC = () => {
                       Sign-off by {sub.managerDecision.managerName}
                     </span>
                   </div>
-                  <p className="text-white font-sans mt-1 leading-relaxed">
+                  <p className="text-warm-charcoal font-sans mt-1 leading-relaxed">
                     "{sub.managerDecision.feedback}"
                   </p>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl bg-dark-subtle border border-dark-border/60 text-xs text-dark-dim flex items-center justify-between">
+                <div className="p-3 rounded-lg bg-warm-subtle/70 border border-warm-border text-xs text-warm-muted flex items-center justify-between">
                   <span>Manager decision is currently pending review.</span>
-                  <span className="text-brand-blue font-mono hover:underline">
-                    Open Review Details →
+                  <span className="text-wine font-medium hover:underline flex items-center gap-1">
+                    Open Review Details <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
               )}

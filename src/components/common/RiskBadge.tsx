@@ -18,32 +18,27 @@ export const RiskBadge: React.FC<Props> = ({
   const configs = {
     critical: {
       label: 'Critical Risk',
-      bg: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-      dot: 'bg-rose-500',
+      bg: 'bg-red-50 text-red-800 border-red-200/80',
       icon: ShieldAlert,
     },
     high: {
       label: 'High Risk',
-      bg: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-      dot: 'bg-orange-500',
+      bg: 'bg-amber-50 text-amber-900 border-amber-300/80',
       icon: AlertTriangle,
     },
     medium: {
       label: 'Medium Risk',
-      bg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-      dot: 'bg-amber-500',
+      bg: 'bg-tobacco-50 text-tobacco-800 border-tobacco-200',
       icon: AlertCircle,
     },
     low: {
       label: 'Low Risk',
-      bg: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-      dot: 'bg-blue-400',
+      bg: 'bg-warm-subtle text-warm-charcoal border-warm-border',
       icon: ShieldCheck,
     },
     safe: {
       label: 'Passed / Safe',
-      bg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-      dot: 'bg-emerald-400',
+      bg: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
       icon: CheckCircle2,
     },
   };
@@ -52,19 +47,19 @@ export const RiskBadge: React.FC<Props> = ({
   const Icon = config.icon;
 
   const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5 gap-1',
-    md: 'text-xs px-2.5 py-1 gap-1.5',
-    lg: 'text-sm px-3 py-1.5 gap-2 font-medium',
+    sm: 'text-[11px] px-2 py-0.5 gap-1 font-mono',
+    md: 'text-xs px-2.5 py-1 gap-1.5 font-mono',
+    lg: 'text-xs px-3 py-1.5 gap-2 font-medium font-sans',
   };
 
   return (
     <span 
-      className={`inline-flex items-center rounded-full border font-mono tracking-wide ${config.bg} ${sizeClasses[size]}`}
+      className={`inline-flex items-center rounded-md border font-medium tracking-tight ${config.bg} ${sizeClasses[size]}`}
     >
-      {showIcon && <Icon className={size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5'} />}
-      <span className="capitalize">{config.label}</span>
+      {showIcon && <Icon className={size === 'lg' ? 'w-4 h-4' : 'w-3.5 h-3.5 shrink-0'} />}
+      <span>{config.label}</span>
       {score !== undefined && (
-        <span className="opacity-75 font-semibold">
+        <span className="opacity-75 font-semibold ml-0.5">
           ({score}/100)
         </span>
       )}

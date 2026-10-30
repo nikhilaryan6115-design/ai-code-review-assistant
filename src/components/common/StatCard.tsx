@@ -8,8 +8,7 @@ interface Props {
   isPositive?: boolean;
   subtitle?: string;
   icon: LucideIcon;
-  iconColor?: string;
-  iconBg?: string;
+  badge?: string;
 }
 
 export const StatCard: React.FC<Props> = ({
@@ -19,40 +18,48 @@ export const StatCard: React.FC<Props> = ({
   isPositive,
   subtitle,
   icon: Icon,
-  iconColor = 'text-brand-blue',
-  iconBg = 'bg-brand-blue/10 border-brand-blue/20',
+  badge
 }) => {
   return (
-    <div className="bg-dark-card border border-dark-border rounded-xl p-5 hover:border-dark-borderLight transition-all duration-200 group">
-      <div className="flex items-start justify-between">
-        <span className="text-sm font-medium text-dark-muted tracking-tight">{title}</span>
-        <div className={`p-2.5 rounded-lg border ${iconBg}`}>
-          <Icon className={`w-5 h-5 ${iconColor}`} />
+    <div className="bg-warm-white border border-warm-border rounded-xl p-5 hover:border-warm-borderStrong transition-all duration-150 shadow-warm-sm group">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-warm-muted uppercase tracking-wider">{title}</span>
+        <div className="w-8 h-8 rounded-lg bg-warm-subtle/80 border border-warm-border/60 flex items-center justify-center text-tobacco group-hover:text-wine-700 transition-colors">
+          <Icon className="w-4 h-4" />
         </div>
       </div>
 
-      <div className="mt-4 flex items-baseline gap-2">
-        <span className="text-2xl lg:text-3xl font-bold font-mono text-dark-text tracking-tight">
+      <div className="mt-3 flex items-baseline justify-between">
+        <span className="text-2xl font-bold tracking-tight text-warm-charcoal font-sans">
           {value}
         </span>
-        {change && (
-          <span
-            className={`inline-flex items-center text-xs font-medium ${
-              isPositive ? 'text-emerald-400' : 'text-rose-400'
-            }`}
-          >
-            {isPositive ? (
-              <TrendingUp className="w-3.5 h-3.5 mr-0.5" />
-            ) : (
-              <TrendingDown className="w-3.5 h-3.5 mr-0.5" />
-            )}
-            {change}
+        {badge && (
+          <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-buttercream/60 border border-warm-border text-tobacco-700">
+            {badge}
           </span>
         )}
       </div>
 
-      {subtitle && (
-        <p className="mt-1 text-xs text-dark-dim truncate">{subtitle}</p>
+      {(change || subtitle) && (
+        <div className="mt-2.5 pt-2.5 border-t border-warm-border/40 flex items-center justify-between text-xs">
+          {change && (
+            <span
+              className={`inline-flex items-center font-medium ${
+                isPositive ? 'text-emerald-700' : 'text-red-700'
+              }`}
+            >
+              {isPositive ? (
+                <TrendingUp className="w-3.5 h-3.5 mr-1" />
+              ) : (
+                <TrendingDown className="w-3.5 h-3.5 mr-1" />
+              )}
+              {change}
+            </span>
+          )}
+          {subtitle && (
+            <span className="text-warm-muted truncate text-[11px] ml-auto">{subtitle}</span>
+          )}
+        </div>
       )}
     </div>
   );

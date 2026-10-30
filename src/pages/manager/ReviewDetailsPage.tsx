@@ -10,7 +10,6 @@ import {
   ArrowLeft, 
   GitPullRequest, 
   GitBranch, 
-  Calendar, 
   Clock, 
   Bot, 
   ShieldAlert, 
@@ -24,12 +23,9 @@ import {
   Zap, 
   Shield, 
   RefreshCw,
-  ExternalLink,
-  ChevronRight,
   FileCode2,
   CheckCheck
 } from 'lucide-react';
-import { Severity, IssueCategory } from '../../types';
 
 export const ReviewDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,18 +40,15 @@ export const ReviewDetailsPage: React.FC = () => {
     addToast 
   } = useApp();
 
-  // Find submission, defaulting to sub-142 if not found or id is default
   const submission = submissions.find((s) => s.id === id) || submissions[0];
 
-  // Active Category / Severity Filter for Findings
   const [activeTab, setActiveTab] = useState<'all' | 'critical' | 'security' | 'performance' | 'quality'>('all');
   const [selectedIssueId, setSelectedIssueId] = useState<string>(submission.issues[0]?.id || '');
   
-  // Modals & comments
   const [modalType, setModalType] = useState<'approve' | 'request_changes' | null>(null);
   const [newComment, setNewComment] = useState('');
   const [commentList, setCommentList] = useState<string[]>([
-    'Automated AI pre-check completed by Qwen2.5-Coder 7B. Flagged 1 critical security vulnerability.'
+    'Automated AI pre-check completed by Qwen2.5-Coder 7B. Identified 1 critical SQL injection vulnerability and 1 missing input validation warning.'
   ]);
 
   const handleAddComment = (e: React.FormEvent) => {
@@ -63,10 +56,9 @@ export const ReviewDetailsPage: React.FC = () => {
     if (!newComment.trim()) return;
     setCommentList((prev) => [...prev, newComment]);
     setNewComment('');
-    addToast('Comment Posted', 'Your review comment was added to the pull request.', 'success');
+    addToast('Comment Logged', 'Review feedback posted to developer PR thread.', 'success');
   };
 
-  // Filtered issues list
   const filteredIssues = submission.issues.filter((issue) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'critical') return issue.severity === 'critical';
@@ -84,23 +76,23 @@ export const ReviewDetailsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Top Back Nav & Quick Status Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-dark-border/80 pb-4">
+      {/* Top Breadcrumb & Action Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-warm-border pb-4 bg-warm-white p-4 rounded-xl shadow-warm-sm">
         <div className="flex items-center gap-3">
           <Link
             to="/manager/submissions"
-            className="p-2 rounded-lg bg-dark-card border border-dark-border text-dark-muted hover:text-white transition-colors"
+            className="p-2 rounded-lg bg-warm-subtle/80 border border-warm-border text-warm-charcoal hover:bg-warm-subtle transition-colors"
             title="Back to submissions"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-dark-dim">
+            <div className="flex items-center gap-2 text-xs font-mono text-warm-muted">
               <span>{submission.repository.name}</span>
               <span>/</span>
-              <span className="text-brand-blue">Pull Request #{submission.prNumber}</span>
+              <span className="text-wine font-semibold">Pull Request #{submission.prNumber}</span>
             </div>
-            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2 mt-0.5">
+            <h1 className="text-lg font-bold text-warm-charcoal tracking-tight flex items-center gap-2 mt-0.5">
               <span>{submission.title}</span>
             </h1>
           </div>
@@ -111,16 +103,16 @@ export const ReviewDetailsPage: React.FC = () => {
           <button
             onClick={() => triggerAIScan(submission.id)}
             disabled={submission.status === 'ai_reviewing'}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-dark-card border border-dark-border text-xs font-mono text-dark-text hover:text-white hover:border-brand-purple transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-warm-white border border-warm-border text-xs font-mono text-warm-charcoal hover:bg-warm-subtle transition-all disabled:opacity-50 shadow-warm-sm"
             title="Re-run Qwen2.5-Coder 7B"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-brand-purpleLight ${submission.status === 'ai_reviewing' ? 'animate-spin' : ''}`} />
-            <span>Re-run AI</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-tobacco ${submission.status === 'ai_reviewing' ? 'animate-spin' : ''}`} />
+            <span>Re-analyze</span>
           </button>
 
           <button
             onClick={() => setModalType('request_changes')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100 text-xs font-semibold transition-all shadow-warm-sm"
           >
             <XCircle className="w-3.5 h-3.5" />
             <span>Request Changes</span>
@@ -128,7 +120,7 @@ export const ReviewDetailsPage: React.FC = () => {
 
           <button
             onClick={() => setModalType('approve')}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-950/40 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-wine hover:bg-wine-800 text-white text-xs font-semibold shadow-wine-sm transition-all"
           >
             <Check className="w-3.5 h-3.5" />
             <span>Approve PR</span>
@@ -139,27 +131,27 @@ export const ReviewDetailsPage: React.FC = () => {
       {/* Decision Banner if already decided */}
       {submission.managerDecision && (
         <div
-          className={`p-4 rounded-xl border flex items-start gap-3 ${
+          className={`p-4 rounded-xl border flex items-start gap-3 shadow-warm-sm ${
             submission.managerDecision.decision === 'approved'
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-              : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+              ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+              : 'bg-amber-50 text-amber-900 border-amber-300'
           }`}
         >
           {submission.managerDecision.decision === 'approved' ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold uppercase tracking-wider font-mono">
                 Manager Decision: {submission.managerDecision.decision.replace('_', ' ')}
               </h4>
-              <span className="text-[10px] font-mono opacity-75">
+              <span className="text-[10px] font-mono opacity-80">
                 {new Date(submission.managerDecision.decidedAt).toLocaleTimeString()}
               </span>
             </div>
-            <p className="text-xs mt-1 text-white leading-relaxed">
+            <p className="text-xs mt-1 leading-relaxed font-sans font-medium">
               "{submission.managerDecision.feedback}"
             </p>
             <p className="text-[10px] font-mono opacity-80 mt-1">
@@ -169,14 +161,14 @@ export const ReviewDetailsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Grid: Left Column Summary & AI Findings, Right Column Code Viewer */}
+      {/* Main Grid: Left Column Summary & AI Findings, Right Column Code Viewer */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column (5 cols on large screen): Metadata, AI Overview, Categorized Issues */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Left Column (5 cols): Metadata, AI Overview, Categorized Issues */}
+        <div className="lg:col-span-5 space-y-5">
           {/* 1. Code Submission Summary Card */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-5 shadow-lg space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-dark-dim">
+          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-warm-muted font-medium">
                 Submission Metadata
               </span>
               <StatusBadge status={submission.status} size="sm" />
@@ -186,50 +178,50 @@ export const ReviewDetailsPage: React.FC = () => {
               <img
                 src={submission.developer.avatar}
                 alt={submission.developer.name}
-                className="w-10 h-10 rounded-full object-cover ring-2 ring-brand-blue/30"
+                className="w-10 h-10 rounded-full object-cover ring-1 ring-warm-border"
               />
               <div>
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-bold text-warm-charcoal">
                   {submission.developer.name}
                 </p>
-                <p className="text-xs text-dark-dim font-mono">
+                <p className="text-xs text-warm-muted font-mono">
                   {submission.developer.email} • {submission.developer.role}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-dark-border/60 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-dark-subtle border border-dark-border">
-                <span className="text-dark-dim text-[10px] block">Branch</span>
-                <span className="text-brand-blue font-semibold truncate block">
+            <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs font-mono">
+              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
+                <span className="text-warm-muted text-[10px] block">Branch</span>
+                <span className="text-wine font-semibold truncate block">
                   {submission.repository.branch}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-dark-subtle border border-dark-border">
-                <span className="text-dark-dim text-[10px] block">Language</span>
-                <span className="text-dark-text font-semibold">{submission.language}</span>
+              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
+                <span className="text-warm-muted text-[10px] block">Language</span>
+                <span className="text-warm-charcoal font-semibold">{submission.language}</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-dark-subtle border border-dark-border">
-                <span className="text-dark-dim text-[10px] block">Lines Changed</span>
-                <span className="text-white">
-                  <span className="text-emerald-400">+{submission.additions}</span>{' '}
-                  <span className="text-rose-400">-{submission.deletions}</span>
+              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
+                <span className="text-warm-muted text-[10px] block">Diff Changes</span>
+                <span className="text-warm-charcoal font-medium">
+                  <span className="text-emerald-700 font-semibold">+{submission.additions}</span>{' '}
+                  <span className="text-red-700 font-semibold">-{submission.deletions}</span>
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-dark-subtle border border-dark-border">
-                <span className="text-dark-dim text-[10px] block">AI Scan Time</span>
-                <span className="text-emerald-400 font-semibold">
-                  {submission.reviewTimeSeconds || 14}s (Instant)
+              <div className="p-2.5 rounded-lg bg-warm-subtle/70 border border-warm-border/80">
+                <span className="text-warm-muted text-[10px] block">AI Scan Time</span>
+                <span className="text-emerald-800 font-semibold">
+                  {submission.reviewTimeSeconds || 14}s
                 </span>
               </div>
             </div>
           </div>
 
           {/* 3. Overall Risk Assessment Meter */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-5 shadow-lg space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-dark-dim flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
+              <span className="text-xs font-mono uppercase tracking-wider text-warm-muted font-medium flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-red-700" />
                 Overall Risk Assessment
               </span>
               <RiskBadge level={submission.riskLevel} score={submission.riskScore} size="sm" />
@@ -238,21 +230,21 @@ export const ReviewDetailsPage: React.FC = () => {
             {/* Risk Gauge Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-mono">
-                <span className="text-dark-dim">Threat Composite Score</span>
+                <span className="text-warm-muted">Threat Composite Score</span>
                 <span className={`font-bold ${
-                  submission.riskScore > 75 ? 'text-rose-400' : submission.riskScore > 40 ? 'text-amber-400' : 'text-emerald-400'
+                  submission.riskScore > 75 ? 'text-red-800' : submission.riskScore > 40 ? 'text-amber-800' : 'text-emerald-800'
                 }`}>
                   {submission.riskScore} / 100
                 </span>
               </div>
-              <div className="w-full h-2.5 bg-dark-bg rounded-full overflow-hidden border border-dark-border">
+              <div className="w-full h-2.5 bg-warm-subtle rounded-full overflow-hidden border border-warm-border">
                 <div
                   className={`h-full transition-all duration-500 rounded-full ${
                     submission.riskScore > 75
-                      ? 'bg-gradient-to-r from-orange-500 to-rose-500'
+                      ? 'bg-red-700'
                       : submission.riskScore > 40
-                      ? 'bg-gradient-to-r from-blue-500 to-amber-500'
-                      : 'bg-emerald-500'
+                      ? 'bg-amber-600'
+                      : 'bg-emerald-700'
                   }`}
                   style={{ width: `${submission.riskScore}%` }}
                 />
@@ -261,63 +253,63 @@ export const ReviewDetailsPage: React.FC = () => {
 
             {/* Findings Pill Counters */}
             <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs font-mono">
-              <div className="p-2 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300">
+              <div className="p-2 rounded-lg bg-red-50 border border-red-200 text-red-900">
                 <span className="block text-base font-bold">{criticalIssuesCount}</span>
-                <span className="text-[10px] uppercase opacity-80">Critical</span>
+                <span className="text-[10px] uppercase font-medium">Critical</span>
               </div>
-              <div className="p-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">
+              <div className="p-2 rounded-lg bg-amber-50 border border-amber-300 text-amber-900">
                 <span className="block text-base font-bold">{warningsCount}</span>
-                <span className="text-[10px] uppercase opacity-80">Warnings</span>
+                <span className="text-[10px] uppercase font-medium">Warnings</span>
               </div>
-              <div className="p-2 rounded bg-brand-blue/10 border border-brand-blue/20 text-brand-blue">
+              <div className="p-2 rounded-lg bg-warm-subtle border border-warm-border text-warm-charcoal">
                 <span className="block text-base font-bold">{submission.issues.length}</span>
-                <span className="text-[10px] uppercase opacity-80">Total Issues</span>
+                <span className="text-[10px] uppercase font-medium">Total</span>
               </div>
             </div>
           </div>
 
           {/* 2. AI-Generated Summary & Explanation (Qwen2.5-Coder 7B) */}
-          <div className="bg-gradient-to-b from-dark-card to-dark-subtle border border-brand-purple/30 rounded-2xl p-5 shadow-lg space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="bg-buttercream/50 border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-3">
+            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-brand-purple/20 text-brand-purpleLight border border-brand-purple/40">
+                <div className="p-1 rounded bg-wine/10 text-wine">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
+                  <h3 className="text-xs font-bold text-warm-charcoal font-mono uppercase tracking-wider">
                     Qwen2.5-Coder 7B Synthesis
                   </h3>
-                  <span className="text-[10px] text-dark-dim font-mono">Model: {submission.aiModel}</span>
+                  <span className="text-[10px] text-warm-muted font-mono">Engine: {submission.aiModel}</span>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
-                Analysis Complete
+              <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-medium">
+                Analysis Ready
               </span>
             </div>
 
             {/* AI Summary Quote (Matches Prompt Sample) */}
-            <blockquote className="p-3.5 rounded-xl bg-dark-bg/90 border border-dark-border text-xs text-brand-purpleLight/95 leading-relaxed font-sans italic">
+            <blockquote className="p-3.5 rounded-lg bg-warm-white border border-warm-border text-xs text-warm-charcoal leading-relaxed font-sans italic">
               "{submission.aiSummary}"
             </blockquote>
 
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-dark-dim block mb-1">
-                Functional Overview & Architecture Impact
+              <span className="text-[10px] font-mono uppercase tracking-wider text-warm-muted font-semibold block mb-1">
+                Architecture & Security Assessment
               </span>
-              <p className="text-xs text-dark-text leading-relaxed">
+              <p className="text-xs text-warm-charcoal leading-relaxed font-sans">
                 {submission.aiExplanation}
               </p>
             </div>
           </div>
 
           {/* Categorized Issues & Suggested Fixes Section */}
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-white tracking-tight">
-                  Detailed AI Findings & Fixes ({submission.issues.length})
+                <h3 className="text-sm font-bold text-warm-charcoal tracking-tight">
+                  Actionable AI Findings ({submission.issues.length})
                 </h3>
-                <p className="text-[11px] text-dark-muted">Click an issue to jump to problematic code</p>
+                <p className="text-[11px] text-warm-muted">Select an issue to highlight line in code viewer</p>
               </div>
             </div>
 
@@ -327,8 +319,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('all')}
                 className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'all'
-                    ? 'bg-brand-blue text-white font-bold'
-                    : 'bg-dark-card text-dark-muted hover:text-white border border-dark-border'
+                    ? 'bg-wine text-white font-bold shadow-wine-sm'
+                    : 'bg-warm-white text-warm-muted hover:text-warm-charcoal border border-warm-border'
                 }`}
               >
                 All ({submission.issues.length})
@@ -338,8 +330,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('critical')}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'critical'
-                    ? 'bg-rose-600 text-white font-bold'
-                    : 'bg-dark-card text-rose-400 hover:text-rose-300 border border-rose-500/30'
+                    ? 'bg-red-800 text-white font-bold'
+                    : 'bg-warm-white text-red-800 hover:bg-red-50 border border-red-200'
                 }`}
               >
                 <ShieldAlert className="w-3 h-3" />
@@ -350,8 +342,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('security')}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'security'
-                    ? 'bg-brand-purple text-white font-bold'
-                    : 'bg-dark-card text-brand-purpleLight hover:text-white border border-brand-purple/30'
+                    ? 'bg-tobacco text-white font-bold'
+                    : 'bg-warm-white text-tobacco hover:bg-tobacco-50 border border-tobacco-200'
                 }`}
               >
                 <Shield className="w-3 h-3" />
@@ -362,8 +354,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('performance')}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'performance'
-                    ? 'bg-amber-600 text-white font-bold'
-                    : 'bg-dark-card text-amber-400 hover:text-amber-300 border border-amber-500/30'
+                    ? 'bg-amber-800 text-white font-bold'
+                    : 'bg-warm-white text-amber-900 hover:bg-amber-50 border border-amber-300'
                 }`}
               >
                 <Zap className="w-3 h-3" />
@@ -374,8 +366,8 @@ export const ReviewDetailsPage: React.FC = () => {
                 onClick={() => setActiveTab('quality')}
                 className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === 'quality'
-                    ? 'bg-emerald-600 text-white font-bold'
-                    : 'bg-dark-card text-emerald-400 hover:text-emerald-300 border border-emerald-500/30'
+                    ? 'bg-emerald-800 text-white font-bold'
+                    : 'bg-warm-white text-emerald-800 hover:bg-emerald-50 border border-emerald-300'
                 }`}
               >
                 <CheckCircle2 className="w-3 h-3" />
@@ -400,16 +392,16 @@ export const ReviewDetailsPage: React.FC = () => {
         </div>
 
         {/* Right Column (7 cols): Interactive Code Viewer & Manager Review Chat */}
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-5">
           {/* Code Viewer Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-white tracking-tight flex items-center gap-2">
-                <FileCode2 className="w-4 h-4 text-brand-blue" />
-                Interactive Code Inspection & Problematic Line Highlights
+              <h3 className="text-sm font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
+                <FileCode2 className="w-4 h-4 text-wine" />
+                Code Inspection with Problem Line Highlighting
               </h3>
-              <p className="text-[11px] text-dark-muted">
-                Line 42: SQL injection (Critical) • Line 18: Missing validation • Line 67: N+1 query
+              <p className="text-[11px] text-warm-muted">
+                Line 42: SQL injection (Critical) • Line 18: Missing validation • Line 67: Inefficient loop
               </p>
             </div>
           </div>
@@ -423,25 +415,25 @@ export const ReviewDetailsPage: React.FC = () => {
           />
 
           {/* Manager Feedback & Comments Section */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-5 shadow-lg space-y-4">
-            <div className="flex items-center justify-between border-b border-dark-border/60 pb-3">
+          <div className="bg-warm-white border border-warm-border rounded-xl p-5 shadow-warm-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-warm-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-brand-blue" />
-                <h4 className="text-xs font-semibold text-white uppercase font-mono tracking-wider">
-                  Manager Feedback & Review Discussion
+                <MessageSquare className="w-4 h-4 text-wine" />
+                <h4 className="text-xs font-bold text-warm-charcoal uppercase font-mono tracking-wider">
+                  Manager Feedback & Instruction Thread
                 </h4>
               </div>
-              <span className="text-[10px] font-mono text-dark-dim">
-                {commentList.length} comments
+              <span className="text-[10px] font-mono text-warm-muted">
+                {commentList.length} updates
               </span>
             </div>
 
             {/* Comment Thread */}
-            <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
               {commentList.map((c, i) => (
-                <div key={i} className="p-3 rounded-xl bg-dark-subtle border border-dark-border/70 text-xs text-dark-text">
-                  <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-dark-dim">
-                    <span className="font-semibold text-brand-blue">
+                <div key={i} className="p-3 rounded-lg bg-warm-subtle/60 border border-warm-border text-xs text-warm-charcoal">
+                  <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-warm-muted">
+                    <span className="font-semibold text-wine">
                       {i === 0 ? 'RevAI Bot (Qwen2.5-Coder)' : 'Sarah Jenkins (Manager)'}
                     </span>
                     <span>Just now</span>
@@ -457,12 +449,12 @@ export const ReviewDetailsPage: React.FC = () => {
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add inline note or instruction for developer..."
-                className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3.5 py-2 text-xs text-white placeholder-dark-dim focus:outline-none focus:border-brand-blue font-sans"
+                placeholder="Add instruction or note for developer..."
+                className="flex-1 bg-warm-bg border border-warm-border rounded-lg px-3 py-2 text-xs text-warm-charcoal placeholder-warm-dim focus:outline-none focus:border-wine focus:bg-warm-white font-sans"
               />
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-blue hover:bg-brand-blueHover text-white text-xs font-semibold shadow-sm transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-wine hover:bg-wine-800 text-white text-xs font-semibold shadow-wine-sm transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Send</span>

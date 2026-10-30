@@ -4,55 +4,44 @@
 
 @layer base {
   body {
-    background-color: #0A0D14;
-    color: #F1F5F9;
+    background-color: #F9F5EC;
+    color: #30272A;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  /* Custom Sleek Dark Scrollbars */
+  /* Custom Warm Scrollbars */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #0A0D14;
+    background: #F4ECE0;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #232D42;
+    background: #D2BDA4;
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #3B82F6;
+    background: #987653;
+  }
+
+  /* Selection style */
+  ::selection {
+    background-color: #F5E8C9;
+    color: #46212D;
   }
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(16px);
-    opacity: 0;
+@layer utilities {
+  .subtle-border {
+    border-color: #E8DCB8;
   }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+  
+  .glass-warm {
+    background-color: rgba(255, 253, 247, 0.85);
+    backdrop-filter: blur(8px);
   }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-slide-in {
-  animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
 }

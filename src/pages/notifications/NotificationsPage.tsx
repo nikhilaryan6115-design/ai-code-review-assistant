@@ -7,9 +7,7 @@ import {
   Sparkles, 
   ShieldCheck, 
   CheckCheck, 
-  ArrowRight, 
-  Filter, 
-  Trash2 
+  ArrowRight
 } from 'lucide-react';
 
 export const NotificationsPage: React.FC = () => {
@@ -28,20 +26,20 @@ export const NotificationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Bell className="w-6 h-6 text-brand-blue" />
-            Notifications & Security Alerts
+          <h1 className="text-xl sm:text-2xl font-bold text-warm-charcoal tracking-tight flex items-center gap-2">
+            <Bell className="w-5 h-5 text-wine" />
+            Notifications & System Alerts
           </h1>
-          <p className="text-xs text-dark-muted mt-1">
-            Real-time feed of automated Qwen2.5-Coder detections, manager review assignments, and system webhooks.
+          <p className="text-xs text-warm-muted mt-1">
+            Real-time feed of automated Qwen2.5-Coder detections, manager review sign-offs, and webhook dispatches.
           </p>
         </div>
 
         <button
           onClick={markAllNotificationsRead}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-dark-card border border-dark-border text-xs font-mono text-dark-text hover:text-white transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-warm-white border border-warm-border text-xs font-mono text-warm-charcoal hover:bg-warm-subtle transition-colors shadow-warm-sm"
         >
-          <CheckCheck className="w-4 h-4 text-brand-blue" />
+          <CheckCheck className="w-4 h-4 text-wine" />
           <span>Mark all as read</span>
         </button>
       </div>
@@ -50,24 +48,24 @@ export const NotificationsPage: React.FC = () => {
       <div className="flex items-center gap-2 text-xs font-mono">
         <button
           onClick={() => setFilterType('all')}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterType === 'all' ? 'bg-brand-blue text-white font-bold' : 'bg-dark-card text-dark-muted hover:text-white'
+          className={`px-3 py-1.5 rounded-md transition-colors ${
+            filterType === 'all' ? 'bg-wine text-white font-bold' : 'bg-warm-white text-warm-muted hover:text-warm-charcoal border border-warm-border'
           }`}
         >
           All ({notifications.length})
         </button>
         <button
           onClick={() => setFilterType('unread')}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterType === 'unread' ? 'bg-brand-blue text-white font-bold' : 'bg-dark-card text-dark-muted hover:text-white'
+          className={`px-3 py-1.5 rounded-md transition-colors ${
+            filterType === 'unread' ? 'bg-wine text-white font-bold' : 'bg-warm-white text-warm-muted hover:text-warm-charcoal border border-warm-border'
           }`}
         >
           Unread ({notifications.filter(n => !n.read).length})
         </button>
         <button
           onClick={() => setFilterType('critical')}
-          className={`px-3 py-1.5 rounded-lg transition-colors ${
-            filterType === 'critical' ? 'bg-rose-600 text-white font-bold' : 'bg-dark-card text-rose-400 hover:text-rose-300'
+          className={`px-3 py-1.5 rounded-md transition-colors ${
+            filterType === 'critical' ? 'bg-red-800 text-white font-bold' : 'bg-warm-white text-red-800 hover:bg-red-50 border border-red-200'
           }`}
         >
           Critical Vulnerabilities
@@ -75,10 +73,10 @@ export const NotificationsPage: React.FC = () => {
       </div>
 
       {/* List */}
-      <div className="bg-dark-card border border-dark-border rounded-2xl divide-y divide-dark-border/60 overflow-hidden shadow-lg">
+      <div className="bg-warm-white border border-warm-border rounded-xl divide-y divide-warm-border/60 overflow-hidden shadow-warm-sm">
         {filteredNotifs.length === 0 ? (
-          <div className="p-8 text-center text-dark-dim text-xs font-mono">
-            No notifications found.
+          <div className="p-8 text-center text-warm-muted text-xs font-mono">
+            No notifications found in this category.
           </div>
         ) : (
           filteredNotifs.map((notif) => (
@@ -90,42 +88,42 @@ export const NotificationsPage: React.FC = () => {
                   navigate(`/manager/reviews/${notif.submissionId}`);
                 }
               }}
-              className={`p-4 hover:bg-dark-subtle/70 transition-colors cursor-pointer flex items-start gap-3.5 ${
-                !notif.read ? 'bg-dark-subtle/30' : ''
+              className={`p-4 hover:bg-warm-subtle/50 transition-colors cursor-pointer flex items-start gap-3.5 ${
+                !notif.read ? 'bg-buttercream/25' : ''
               }`}
             >
               {/* Type icon */}
-              <div className="p-2 rounded-xl bg-dark-bg border border-dark-border shrink-0 mt-0.5">
+              <div className="p-2 rounded-lg bg-warm-subtle/80 border border-warm-border shrink-0 mt-0.5">
                 {notif.type === 'critical' ? (
-                  <ShieldAlert className="w-5 h-5 text-rose-400" />
+                  <ShieldAlert className="w-4 h-4 text-red-700" />
                 ) : notif.type === 'warning' ? (
-                  <Sparkles className="w-5 h-5 text-amber-400" />
+                  <Sparkles className="w-4 h-4 text-amber-700" />
                 ) : (
-                  <ShieldCheck className="w-5 h-5 text-brand-blue" />
+                  <ShieldCheck className="w-4 h-4 text-wine" />
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h4 className={`text-xs ${!notif.read ? 'font-bold text-white' : 'font-semibold text-dark-text'}`}>
+                  <h4 className={`text-xs ${!notif.read ? 'font-bold text-warm-charcoal' : 'font-semibold text-warm-charcoal'}`}>
                     {notif.title}
                   </h4>
-                  <span className="text-[10px] font-mono text-dark-dim">
+                  <span className="text-[10px] font-mono text-warm-muted">
                     {notif.timestamp}
                   </span>
                 </div>
-                <p className="text-xs text-dark-muted mt-1 leading-relaxed">
+                <p className="text-xs text-warm-muted mt-1 leading-relaxed">
                   {notif.message}
                 </p>
                 {notif.prNumber && (
-                  <span className="inline-block mt-2 text-[11px] font-mono text-brand-blue hover:underline">
+                  <span className="inline-block mt-2 text-[11px] font-mono text-wine hover:underline font-medium">
                     Inspect Pull Request #{notif.prNumber} →
                   </span>
                 )}
               </div>
 
               {!notif.read && (
-                <div className="w-2 h-2 rounded-full bg-brand-blue shrink-0 mt-2" />
+                <div className="w-2 h-2 rounded-full bg-wine shrink-0 mt-2" />
               )}
             </div>
           ))

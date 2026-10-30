@@ -14,7 +14,8 @@ import {
   ShieldAlert, 
   ChevronLeft, 
   ChevronRight,
-  Bot
+  Bot,
+  Zap
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -26,40 +27,40 @@ export const Sidebar: React.FC = () => {
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
   const managerNav = [
-    { name: 'Dashboard Overview', path: '/manager', icon: LayoutDashboard },
+    { name: 'Dashboard', path: '/manager', icon: LayoutDashboard },
     { 
       name: 'Submissions', 
       path: '/manager/submissions', 
       icon: GitPullRequest, 
       badge: pendingCount, 
-      badgeColor: 'bg-brand-blue/20 text-brand-blue border-brand-blue/30' 
+      badgeColor: 'bg-buttercream text-wine-900 border-warm-border' 
     },
-    { name: 'Developer Management', path: '/manager/developers', icon: Users },
+    { name: 'Team Engineers', path: '/manager/developers', icon: Users },
     { name: 'Review History', path: '/manager/history', icon: History },
   ];
 
   const developerNav = [
-    { name: 'Developer Console', path: '/developer', icon: LayoutDashboard },
+    { name: 'Console', path: '/developer', icon: LayoutDashboard },
     { 
       name: 'My Pull Requests', 
       path: '/developer/submissions', 
       icon: GitPullRequest,
       badge: 2,
-      badgeColor: 'bg-brand-purple/20 text-brand-purpleLight border-brand-purple/30'
+      badgeColor: 'bg-buttercream text-wine-900 border-warm-border'
     },
-    { name: 'Connected Repositories', path: '/developer/repositories', icon: FolderGit2 },
+    { name: 'My Repositories', path: '/developer/repositories', icon: FolderGit2 },
   ];
 
   const systemNav = [
-    { name: 'GitHub Repositories', path: '/repositories', icon: FolderGit2 },
+    { name: 'Repositories', path: '/repositories', icon: FolderGit2 },
     { 
       name: 'Notifications', 
       path: '/notifications', 
       icon: Bell,
       badge: unreadNotifs > 0 ? unreadNotifs : undefined,
-      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+      badgeColor: 'bg-red-100 text-red-800 border-red-200'
     },
-    { name: 'Model & Rules Config', path: '/settings', icon: Sliders },
+    { name: 'AI & Review Rules', path: '/settings', icon: Sliders },
     { name: 'User Profile', path: '/profile', icon: User },
   ];
 
@@ -67,48 +68,40 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`relative flex flex-col border-r border-dark-border bg-dark-bg transition-all duration-300 ${
-        collapsed ? 'w-20' : 'w-64'
+      className={`relative flex flex-col border-r border-warm-border bg-warm-white transition-all duration-200 select-none ${
+        collapsed ? 'w-18' : 'w-60'
       }`}
     >
-      {/* Sidebar toggle button */}
+      {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-dark-card border border-dark-border flex items-center justify-center text-dark-muted hover:text-white shadow-md hover:border-brand-blue transition-colors"
+        className="absolute -right-3 top-5 z-20 w-6 h-6 rounded-full bg-warm-white border border-warm-border flex items-center justify-center text-warm-muted hover:text-wine shadow-warm-sm hover:border-wine transition-colors"
         title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
         {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
       </button>
 
-      {/* Mode Indicator Banner */}
-      <div className={`p-4 border-b border-dark-border/60 ${collapsed ? 'text-center' : ''}`}>
+      {/* Role Context Header */}
+      <div className={`p-4 border-b border-warm-border ${collapsed ? 'text-center px-2' : ''}`}>
         {!collapsed ? (
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-dark-dim">
-                Active Space
+              <span className="text-[10px] font-mono uppercase tracking-wider text-warm-dim block leading-none">
+                Active Perspective
               </span>
-              <p className="text-sm font-bold text-white capitalize flex items-center gap-1.5">
-                {role === 'manager' ? 'Manager Portal' : 'Developer Hub'}
+              <p className="text-xs font-semibold text-warm-charcoal mt-1">
+                {role === 'manager' ? 'Manager Workspace' : 'Developer Workspace'}
               </p>
             </div>
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase ${
-                role === 'manager'
-                  ? 'bg-brand-blue/15 text-brand-blue border-brand-blue/30'
-                  : 'bg-brand-purple/15 text-brand-purpleLight border-brand-purple/30'
-              }`}
+              className="text-[10px] font-mono px-2 py-0.5 rounded border uppercase bg-buttercream text-wine-800 border-warm-border font-medium"
             >
               {role}
             </span>
           </div>
         ) : (
           <div
-            className={`w-9 h-9 mx-auto rounded-lg flex items-center justify-center border font-mono font-bold text-xs ${
-              role === 'manager'
-                ? 'bg-brand-blue/15 text-brand-blue border-brand-blue/30'
-                : 'bg-brand-purple/15 text-brand-purpleLight border-brand-purple/30'
-            }`}
+            className="w-8 h-8 mx-auto rounded-lg flex items-center justify-center border font-mono font-bold text-xs bg-buttercream text-wine-800 border-warm-border"
             title={`${role} mode`}
           >
             {role === 'manager' ? 'MGR' : 'DEV'}
@@ -117,11 +110,11 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Main Navigation Links */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      <div className="flex-1 overflow-y-auto px-2.5 py-4 space-y-6">
         <div>
           {!collapsed && (
-            <p className="px-3 mb-2 text-[11px] font-mono uppercase tracking-wider text-dark-dim">
-              Workflow
+            <p className="px-3 mb-2 text-[10px] font-mono uppercase tracking-wider text-warm-dim font-medium">
+              Review Flow
             </p>
           )}
           <nav className="space-y-1">
@@ -131,24 +124,30 @@ export const Sidebar: React.FC = () => {
                 to={item.path}
                 end={item.path === '/manager' || item.path === '/developer'}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-dark-card text-brand-blue border border-brand-blue/30 shadow-sm'
-                      : 'text-dark-muted hover:text-white hover:bg-dark-subtle/70'
+                      ? 'bg-wine text-white shadow-wine-sm font-semibold'
+                      : 'text-warm-muted hover:text-warm-charcoal hover:bg-warm-subtle/70'
                   } ${collapsed ? 'justify-center px-2' : ''}`
                 }
                 title={collapsed ? item.name : undefined}
               >
-                <item.icon className="w-4 h-4 shrink-0" />
-                {!collapsed && (
-                  <div className="flex items-center justify-between flex-1 min-w-0">
-                    <span className="truncate">{item.name}</span>
-                    {item.badge !== undefined && (
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border ${item.badgeColor}`}>
-                        {item.badge}
-                      </span>
+                {({ isActive }) => (
+                  <>
+                    <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-tobacco'}`} />
+                    {!collapsed && (
+                      <div className="flex items-center justify-between flex-1 min-w-0">
+                        <span className="truncate">{item.name}</span>
+                        {item.badge !== undefined && (
+                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold border ${
+                            isActive ? 'bg-white/20 text-white border-white/30' : item.badgeColor
+                          }`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
               </NavLink>
             ))}
@@ -157,8 +156,8 @@ export const Sidebar: React.FC = () => {
 
         <div>
           {!collapsed && (
-            <p className="px-3 mb-2 text-[11px] font-mono uppercase tracking-wider text-dark-dim">
-              Integrations & Config
+            <p className="px-3 mb-2 text-[10px] font-mono uppercase tracking-wider text-warm-dim font-medium">
+              Configuration
             </p>
           )}
           <nav className="space-y-1">
@@ -167,24 +166,30 @@ export const Sidebar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                  `flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-dark-card text-brand-blue border border-brand-blue/30 shadow-sm'
-                      : 'text-dark-muted hover:text-white hover:bg-dark-subtle/70'
+                      ? 'bg-wine text-white shadow-wine-sm font-semibold'
+                      : 'text-warm-muted hover:text-warm-charcoal hover:bg-warm-subtle/70'
                   } ${collapsed ? 'justify-center px-2' : ''}`
                 }
                 title={collapsed ? item.name : undefined}
               >
-                <item.icon className="w-4 h-4 shrink-0" />
-                {!collapsed && (
-                  <div className="flex items-center justify-between flex-1 min-w-0">
-                    <span className="truncate">{item.name}</span>
-                    {item.badge !== undefined && (
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border ${item.badgeColor}`}>
-                        {item.badge}
-                      </span>
+                {({ isActive }) => (
+                  <>
+                    <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-tobacco'}`} />
+                    {!collapsed && (
+                      <div className="flex items-center justify-between flex-1 min-w-0">
+                        <span className="truncate">{item.name}</span>
+                        {item.badge !== undefined && (
+                          <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold border ${
+                            isActive ? 'bg-white/20 text-white border-white/30' : item.badgeColor
+                          }`}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
               </NavLink>
             ))}
@@ -194,30 +199,30 @@ export const Sidebar: React.FC = () => {
 
       {/* AI Engine Status Card (Bottom) */}
       {!collapsed ? (
-        <div className="p-3 m-3 rounded-xl bg-gradient-to-b from-dark-card to-dark-subtle border border-dark-border">
+        <div className="p-3 m-3 rounded-xl bg-warm-subtle/60 border border-warm-border">
           <div className="flex items-center gap-2 mb-2">
-            <div className="p-1 rounded bg-brand-purple/20 text-brand-purpleLight">
-              <Bot className="w-4 h-4" />
+            <div className="w-6 h-6 rounded-md bg-wine/10 text-wine flex items-center justify-center">
+              <Bot className="w-3.5 h-3.5" />
             </div>
             <div>
-              <p className="text-xs font-semibold text-white">Qwen2.5-Coder</p>
-              <p className="text-[10px] text-dark-dim font-mono">7B-Instruct Engine</p>
+              <p className="text-xs font-semibold text-warm-charcoal leading-none">Qwen2.5-Coder</p>
+              <p className="text-[10px] text-warm-muted font-mono mt-0.5">7B-Instruct Engine</p>
             </div>
           </div>
-          <div className="space-y-1.5 text-[11px] text-dark-muted font-mono pt-1 border-t border-dark-border/40">
+          <div className="space-y-1 text-[11px] text-warm-muted font-mono pt-1.5 border-t border-warm-border/60">
             <div className="flex justify-between items-center">
-              <span>Critical caught:</span>
-              <span className="text-rose-400 font-bold">{criticalCount}</span>
+              <span>Critical prevented:</span>
+              <span className="text-wine font-bold">{criticalCount}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span>Avg inference:</span>
-              <span className="text-emerald-400 font-bold">14s</span>
+              <span>Avg pre-check:</span>
+              <span className="text-emerald-700 font-bold">14s</span>
             </div>
           </div>
         </div>
       ) : (
         <div className="p-3 text-center" title="Qwen2.5-Coder 7B active">
-          <Bot className="w-5 h-5 mx-auto text-brand-purpleLight" />
+          <Bot className="w-4 h-4 mx-auto text-wine" />
         </div>
       )}
     </aside>

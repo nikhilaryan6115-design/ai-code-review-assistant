@@ -11,11 +11,10 @@ import {
   Sparkles, 
   Check, 
   Copy, 
-  ArrowUpRight,
-  Shield,
-  Zap,
+  Shield, 
+  Zap, 
   CheckCheck,
-  EyeOff
+  ArrowRight
 } from 'lucide-react';
 
 interface Props {
@@ -38,33 +37,33 @@ export const IssueCard: React.FC<Props> = ({
 
   const severityConfigs: Record<Severity, { bg: string; text: string; border: string; icon: React.ElementType }> = {
     critical: {
-      bg: 'bg-rose-500/10',
-      text: 'text-rose-400',
-      border: 'border-rose-500/30',
+      bg: 'bg-red-50',
+      text: 'text-red-800',
+      border: 'border-red-200',
       icon: ShieldAlert
     },
     high: {
-      bg: 'bg-orange-500/10',
-      text: 'text-orange-400',
-      border: 'border-orange-500/30',
+      bg: 'bg-amber-50',
+      text: 'text-amber-900',
+      border: 'border-amber-300',
       icon: AlertTriangle
     },
     medium: {
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-400',
-      border: 'border-amber-500/30',
+      bg: 'bg-tobacco-50',
+      text: 'text-tobacco-800',
+      border: 'border-tobacco-200',
       icon: AlertCircle
     },
     low: {
-      bg: 'bg-blue-500/10',
-      text: 'text-blue-400',
-      border: 'border-blue-500/30',
+      bg: 'bg-warm-subtle',
+      text: 'text-warm-charcoal',
+      border: 'border-warm-border',
       icon: Sparkles
     },
     info: {
-      bg: 'bg-slate-500/10',
-      text: 'text-slate-400',
-      border: 'border-slate-500/30',
+      bg: 'bg-warm-subtle',
+      text: 'text-warm-muted',
+      border: 'border-warm-border',
       icon: Code2
     }
   };
@@ -91,59 +90,55 @@ export const IssueCard: React.FC<Props> = ({
 
   return (
     <div
-      className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+      className={`rounded-xl border transition-all duration-150 overflow-hidden ${
         isSelected
-          ? 'bg-dark-card border-brand-blue ring-1 ring-brand-blue/40 shadow-glow-blue'
-          : 'bg-dark-card/90 border-dark-border hover:border-dark-borderLight'
-      } ${isAddressed ? 'opacity-70 border-emerald-500/30' : ''}`}
+          ? 'bg-warm-white border-wine ring-1 ring-wine/20 shadow-warm-md'
+          : 'bg-warm-white border-warm-border hover:border-warm-borderStrong shadow-warm-sm'
+      } ${isAddressed ? 'opacity-70 bg-warm-subtle/40' : ''}`}
     >
       {/* Header Bar */}
       <div
-        className="p-4 flex items-start justify-between cursor-pointer select-none"
+        className="p-4 flex items-start justify-between cursor-pointer select-none bg-warm-white"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className={`p-2 rounded-lg border shrink-0 ${config.bg} ${config.border} ${config.text}`}>
+          <div className={`p-1.5 rounded-lg border shrink-0 ${config.bg} ${config.border} ${config.text}`}>
             <SevIcon className="w-4 h-4" />
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              {/* Severity badge */}
               <span className={`text-[10px] font-mono uppercase tracking-wider font-bold px-2 py-0.5 rounded border ${config.bg} ${config.border} ${config.text}`}>
                 {issue.severity}
               </span>
 
-              {/* Category pill */}
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-dark-muted px-2 py-0.5 rounded bg-dark-subtle border border-dark-border">
-                <CatIcon className="w-3 h-3 text-brand-blue" />
+              <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-warm-muted px-2 py-0.5 rounded bg-warm-subtle border border-warm-border">
+                <CatIcon className="w-3 h-3 text-tobacco" />
                 {issue.category}
               </span>
 
-              {/* File and line indicator */}
-              <span className="text-[11px] font-mono text-dark-dim">
+              <span className="text-[11px] font-mono text-warm-dim">
                 {issue.file}:L{issue.lineStart}{issue.lineEnd > issue.lineStart ? `-${issue.lineEnd}` : ''}
               </span>
 
-              {/* Status if addressed */}
               {isAddressed && (
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-medium flex items-center gap-1">
                   <CheckCheck className="w-3 h-3" /> Fix Applied
                 </span>
               )}
               {isDismissed && (
-                <span className="text-[10px] font-mono text-dark-dim bg-dark-subtle border border-dark-border px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono text-warm-muted bg-warm-subtle border border-warm-border px-2 py-0.5 rounded">
                   Dismissed
                 </span>
               )}
             </div>
 
-            <h4 className="text-sm font-semibold text-white tracking-tight leading-snug">
+            <h4 className="text-sm font-bold text-warm-charcoal tracking-tight">
               {issue.title}
             </h4>
 
             {issue.cwe && (
-              <p className="text-[11px] font-mono text-brand-purpleLight mt-0.5">
+              <p className="text-[11px] font-mono text-tobacco mt-0.5 font-medium">
                 {issue.cwe}
               </p>
             )}
@@ -153,7 +148,7 @@ export const IssueCard: React.FC<Props> = ({
         <div className="flex items-center gap-2 ml-3">
           <button
             type="button"
-            className="p-1 text-dark-dim hover:text-white rounded transition-colors"
+            className="p-1 text-warm-muted hover:text-warm-charcoal rounded transition-colors"
           >
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
@@ -162,72 +157,72 @@ export const IssueCard: React.FC<Props> = ({
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="px-4 pb-4 space-y-3.5 border-t border-dark-border/60 pt-3">
+        <div className="px-4 pb-4 space-y-3.5 border-t border-warm-border/60 pt-3.5 bg-warm-white">
           {/* Explanation */}
           <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-dark-dim block mb-1">
-              Detailed Finding
+            <span className="text-[10px] font-mono uppercase tracking-wider text-warm-muted block mb-1 font-semibold">
+              Finding Explanation
             </span>
-            <p className="text-xs text-dark-text leading-relaxed">
+            <p className="text-xs text-warm-charcoal leading-relaxed font-sans">
               {issue.explanation}
             </p>
           </div>
 
           {/* Why it is a problem */}
-          <div className="p-3 rounded-lg bg-rose-500/5 border border-rose-500/20">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-rose-400 font-bold flex items-center gap-1.5 mb-1">
-              <ShieldAlert className="w-3.5 h-3.5" />
+          <div className="p-3 rounded-lg bg-red-50/70 border border-red-200/80">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-red-900 font-bold flex items-center gap-1.5 mb-1">
+              <ShieldAlert className="w-3.5 h-3.5 text-red-700" />
               Why this is a problem
             </span>
-            <p className="text-xs text-dark-muted leading-relaxed">
+            <p className="text-xs text-red-950/90 leading-relaxed font-sans">
               {issue.whyItIsAProblem}
             </p>
           </div>
 
           {/* Suggested Solution */}
-          <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1.5 mb-1">
-              <Sparkles className="w-3.5 h-3.5" />
+          <div className="p-3 rounded-lg bg-emerald-50/70 border border-emerald-200/80">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-900 font-bold flex items-center gap-1.5 mb-1">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
               Suggested Solution (Qwen2.5-Coder)
             </span>
-            <p className="text-xs text-dark-muted leading-relaxed">
+            <p className="text-xs text-emerald-950/90 leading-relaxed font-sans">
               {issue.suggestedSolution}
             </p>
           </div>
 
           {/* Code comparison diff snippet */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-dark-dim">
-                Suggested Patch
+              <span className="text-[10px] font-mono uppercase tracking-wider text-warm-muted font-semibold">
+                Suggested Patch Comparison
               </span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleCopy(issue.suggestedFixSnippet);
                 }}
-                className="flex items-center gap-1 text-[11px] font-mono text-brand-blue hover:text-white transition-colors"
+                className="flex items-center gap-1 text-[11px] font-mono text-wine hover:text-wine-800 transition-colors font-medium"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copied' : 'Copy Fix'}</span>
               </button>
             </div>
 
-            <div className="rounded-lg bg-dark-bg border border-dark-border overflow-hidden font-mono text-xs">
-              <div className="bg-rose-950/20 border-b border-rose-900/30 p-2 text-rose-300 overflow-x-auto">
-                <span className="text-[10px] font-bold text-rose-400 block mb-1 uppercase tracking-wider">
-                  - Original Vulnerable Code
+            <div className="rounded-lg border border-warm-border overflow-hidden font-mono text-xs">
+              <div className="bg-red-50/70 border-b border-red-200/80 p-2.5 text-red-900 overflow-x-auto">
+                <span className="text-[10px] font-bold text-red-700 block mb-1 uppercase tracking-wider">
+                  - Vulnerable Code
                 </span>
-                <pre className="text-[11px] leading-relaxed whitespace-pre font-mono text-rose-200/90">
+                <pre className="text-[11px] leading-relaxed whitespace-pre font-mono text-red-950">
                   {issue.originalSnippet}
                 </pre>
               </div>
 
-              <div className="bg-emerald-950/20 p-2 text-emerald-300 overflow-x-auto">
-                <span className="text-[10px] font-bold text-emerald-400 block mb-1 uppercase tracking-wider">
+              <div className="bg-emerald-50/70 p-2.5 text-emerald-900 overflow-x-auto">
+                <span className="text-[10px] font-bold text-emerald-700 block mb-1 uppercase tracking-wider">
                   + Suggested Replacement (Qwen2.5-Coder)
                 </span>
-                <pre className="text-[11px] leading-relaxed whitespace-pre font-mono text-emerald-200/90">
+                <pre className="text-[11px] leading-relaxed whitespace-pre font-mono text-emerald-950">
                   {issue.suggestedFixSnippet}
                 </pre>
               </div>
@@ -235,12 +230,12 @@ export const IssueCard: React.FC<Props> = ({
           </div>
 
           {/* Action Row */}
-          <div className="flex items-center justify-between pt-2 border-t border-dark-border/60">
+          <div className="flex items-center justify-between pt-2 border-t border-warm-border/60">
             <button
               onClick={() => onSelect && onSelect()}
-              className="flex items-center gap-1.5 text-xs font-mono text-brand-blue hover:text-white hover:underline transition-colors"
+              className="flex items-center gap-1.5 text-xs font-medium text-wine hover:underline transition-colors"
             >
-              <Code2 className="w-3.5 h-3.5" />
+              <Code2 className="w-3.5 h-3.5 text-tobacco" />
               <span>Inspect in Code Viewer →</span>
             </button>
 
@@ -251,7 +246,7 @@ export const IssueCard: React.FC<Props> = ({
                     e.stopPropagation();
                     onDismiss(issue.id);
                   }}
-                  className="px-2.5 py-1 text-xs text-dark-dim hover:text-dark-text rounded hover:bg-dark-subtle transition-colors"
+                  className="px-2.5 py-1 text-xs text-warm-muted hover:text-warm-charcoal rounded hover:bg-warm-subtle transition-colors"
                 >
                   Dismiss
                 </button>
@@ -263,10 +258,10 @@ export const IssueCard: React.FC<Props> = ({
                     e.stopPropagation();
                     onApplyFix(issue.id);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/90 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
                 >
                   <CheckCheck className="w-3.5 h-3.5" />
-                  <span>Apply Fix</span>
+                  <span>Apply Patch</span>
                 </button>
               )}
             </div>

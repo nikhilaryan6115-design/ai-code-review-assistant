@@ -1,9 +1,10 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { Sidebar } from './components/common/Sidebar';
 import { ToastContainer } from './components/common/ToastContainer';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Manager Pages
 import { ManagerDashboard } from './pages/manager/ManagerDashboard';
@@ -24,15 +25,36 @@ import { RepositoriesPage } from './pages/repositories/RepositoriesPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
 import { ProfilePage } from './pages/profile/ProfilePage';
 
+// Animated Route Wrapper
+const PageWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+      className="w-full"
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 // Main App Layout with Sidebar and Navbar
 const AppLayout: React.FC = () => {
+  const location = useLocation();
+
   return (
-    <div className="min-h-screen bg-dark-bg text-dark-text flex flex-col font-sans">
+    <div className="min-h-screen bg-warm-bg text-warm-charcoal flex flex-col font-sans selection:bg-buttercream selection:text-wine-900">
       <Navbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto w-full">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 max-w-[1560px] mx-auto w-full">
+          <AnimatePresence mode="wait">
+            <PageWrapper key={location.pathname}>
+              <Outlet />
+            </PageWrapper>
+          </AnimatePresence>
         </main>
       </div>
       <ToastContainer />
