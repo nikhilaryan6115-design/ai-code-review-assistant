@@ -199,14 +199,13 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* GitHub Auth option */}
-          <button
-            type="button"
-            onClick={loginAsManager}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded bg-editorial-surface hover:bg-editorial-subtle text-[#F2F4F8] text-xs font-medium border border-editorial-border transition-editorial cursor-pointer"
+          <a
+            href="/api/auth/github"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded bg-editorial-surface hover:bg-editorial-subtle text-[#F2F4F8] text-xs font-medium border border-editorial-border hover:border-editorial-brass/40 transition-editorial cursor-pointer text-center"
           >
-            <Github className="w-4 h-4 text-editorial-slate" />
-            <span>Continue with GitHub Organization</span>
-          </button>
+            <Github className="w-4 h-4 text-editorial-brass" />
+            <span>Continue with GitHub</span>
+          </a>
 
           <div className="text-center pt-1">
             <button

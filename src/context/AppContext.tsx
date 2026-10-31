@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   Submission, 
   Developer, 
@@ -28,10 +28,13 @@ interface AppContextType {
   setRole: (role: UserRole) => void;
   toggleRole: () => void;
   currentUser: {
+    id?: string;
     name: string;
     email: string;
     avatar: string;
     role: string;
+    isGitHubAuth?: boolean;
+    githubUsername?: string;
   };
   submissions: Submission[];
   repositories: Repository[];
@@ -53,6 +56,7 @@ interface AppContextType {
   updateAISettings: (settings: Partial<AISettings>) => void;
   toggleAutoReview: (repoId: string) => void;
   connectNewRepository: (repo: Partial<Repository>) => void;
+  refreshFromBackend: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -66,19 +70,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [aiSettings, setAISettings] = useState<AISettings>(defaultAISettings);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [globalSearch, setGlobalSearch] = useState<string>('');
+  const [backendUser, setBackendUser] = useState<any>(null);
 
-  const currentUser = role === 'manager' 
+  // Sync state from backend on mount
+  const refreshFromBackend = async () => {
+    try {
+      const [authRes, reposRes, subsRes, notifsRes] = await Promise.allSettled([
+        fetch('/api/auth/me').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/repos').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/submissions').then((r) => (r.ok ? r.json() : null)),
+        fetch('/api/notifications').then((r) => (r.ok ? r.json() : null)),
+      ]);
+
+      if (authRes.status === 'fulfilled' && authRes.value?.user) {
+        setBackendUser(authRes.value.user);
+        if (authRes.value.user.role) {
+          setRole(authRes.value.user.role);
+        }
+      }
+
+      if (reposRes.status === 'fulfilled' && reposRes.value?.repositories?.length > 0) {
+        setRepositories(reposRes.value.repositories);
+      }
+
+      if (subsRes.status === 'fulfilled' && subsRes.value?.submissions?.length > 0) {
+        setSubmissions(subsRes.value.submissions);
+      }
+
+      if (notifsRes.status === 'fulfilled' && notifsRes.value?.notifications?.length > 0) {
+        setNotifications(notifsRes.value.notifications);
+      }
+    } catch {
+      // Backend offline or running in mock mode
+    }
+  };
+
+  useEffect(() => {
+    refreshFromBackend();
+  }, []);
+
+  const currentUser = backendUser
+    ? {
+        id: backendUser.id,
+        name: backendUser.name || backendUser.github_username || 'GitHub Engineer',
+        email: backendUser.email || `${backendUser.github_username}@github.internal`,
+        avatar: backendUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        role: backendUser.role === 'developer' ? 'Senior Software Engineer' : 'Director of Engineering',
+        isGitHubAuth: true,
+        githubUsername: backendUser.github_username,
+      }
+    : role === 'manager'
     ? {
         name: 'Sarah Jenkins',
         email: 'sarah.jenkins@acme-corp.internal',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        role: 'Director of Engineering'
+        role: 'Director of Engineering',
+        isGitHubAuth: false,
       }
     : {
         name: 'Rahul Sharma',
         email: 'rahul.sharma@acme-corp.internal',
         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        role: 'Backend Engineer'
+        role: 'Backend Engineer',
+        isGitHubAuth: false,
       };
 
   const addToast = (title: string, message: string, type: Toast['type'] = 'info') => {
@@ -282,7 +336,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         markAllNotificationsRead,
         updateAISettings,
         toggleAutoReview,
-        connectNewRepository
+        connectNewRepository,
+        refreshFromBackend,
       }}
     >
       {children}
