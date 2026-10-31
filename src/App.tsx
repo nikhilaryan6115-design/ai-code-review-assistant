@@ -45,7 +45,17 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-editorial-bg text-[#F2F4F8] flex flex-col font-sans selection:bg-editorial-brass selection:text-editorial-bg">
+    <div className="min-h-screen bg-ivf-bg text-ivf-pri flex flex-col font-sans selection:bg-ivf-accent selection:text-white">
+        {/* Halloween ambient decorations — purely presentational */}
+        <div className="halloween-webs" aria-hidden="true" />
+        <div className="leaf-1" aria-hidden="true">🍂</div>
+        <div className="leaf-2" aria-hidden="true">🍁</div>
+        <div className="leaf-3" aria-hidden="true">🍂</div>
+        <div className="particle particle-1" aria-hidden="true" />
+        <div className="particle particle-2" aria-hidden="true" />
+        <div className="particle particle-3" aria-hidden="true" />
+        <div className="particle particle-4" aria-hidden="true" />
+        <div className="particle particle-5" aria-hidden="true" />
       <Navbar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />

@@ -52,18 +52,18 @@ export const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-[#2E3643] bg-[#161B22] px-4 lg:px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-40 h-14 border-b border-ivf-border bg-ivf-bg px-4 lg:px-6 flex items-center justify-between shadow-[0_1px_4px_var(--color-shadow)]">
       {/* Left: Brand & Search */}
       <div className="flex items-center gap-6">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded border border-[#2E3643] bg-[#1A2332] flex items-center justify-center text-[#C5A059]">
-            <span className="font-serif font-bold text-sm leading-none">R</span>
+          <div className="w-7 h-7 rounded border border-ivf-border bg-ivf-bgAlt flex items-center justify-center text-ivf-accent">
+            <span className="font-sans font-bold text-sm leading-none">R</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-serif text-lg font-medium tracking-tight text-[#F2F4F8]">
-              Rev<span className="text-[#C5A059]">AI</span>
+            <span className="font-sans text-lg font-semibold tracking-tight text-ivf-pri">
+              Rev<span className="text-ivf-accent2">AI</span>
             </span>
-            <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider bg-[#1F2530] text-[#96A0B0] border border-[#2E3643] uppercase font-medium">
+            <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider bg-ivf-bgAlt text-ivf-sec border border-ivf-border uppercase font-medium">
               Qwen2.5-Coder 7B
             </span>
           </div>
@@ -71,15 +71,15 @@ export const Navbar: React.FC = () => {
 
         {/* Global Search Bar */}
         <div className="hidden md:flex items-center relative w-64 lg:w-72">
-          <Search className="w-3.5 h-3.5 text-[#96A0B0] absolute left-3 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-ivf-sec absolute left-3 pointer-events-none" />
           <input
             type="text"
             value={globalSearch}
             onChange={(e) => setGlobalSearch(e.target.value)}
             placeholder="Search reviews, repos, engineers..."
-            className="w-full bg-[#0E1116] border border-[#2E3643] rounded pl-8 pr-8 py-1.5 text-xs text-[#F2F4F8] placeholder-[#96A0B0] focus:outline-none focus:border-[#C5A059] transition-colors font-sans"
+            className="w-full bg-ivf-bgAlt border border-ivf-border rounded-lg pl-8 pr-8 py-1.5 text-xs text-ivf-pri placeholder-ivf-sec focus:outline-none focus:ring-1 focus:ring-ivf-accent focus:border-ivf-accent transition-colors font-sans"
           />
-          <kbd className="absolute right-2 px-1.5 py-0.5 text-[9px] font-mono text-[#96A0B0] bg-[#161B22] border border-[#2E3643] rounded pointer-events-none">
+          <kbd className="absolute right-2 px-1.5 py-0.5 text-[9px] font-mono text-ivf-sec bg-ivf-bg border border-ivf-border rounded pointer-events-none">
             ⌘K
           </kbd>
         </div>
@@ -87,8 +87,8 @@ export const Navbar: React.FC = () => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Role Toggle Switcher */}
-        <div className="flex items-center bg-[#0E1116] border border-[#2E3643] p-0.5 rounded">
+        {/* Role Toggle — segmented control */}
+        <div className="flex items-center bg-ivf-bgAlt rounded-lg p-0.5">
           <button
             onClick={() => {
               if (role !== 'manager') {
@@ -96,13 +96,13 @@ export const Navbar: React.FC = () => {
                 navigate('/manager');
               }
             }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
               role === 'manager'
-                ? 'bg-[#1A2332] text-[#F2F4F8] border border-[#2E3643] font-medium shadow-sm'
-                : 'text-[#96A0B0] hover:text-[#F2F4F8]'
+                ? 'bg-ivf-accent text-white shadow-sm'
+                : 'text-ivf-sec hover:text-ivf-pri'
             }`}
           >
-            <UserCheck className="w-3.5 h-3.5 text-[#C5A059]" />
+            <UserCheck className="w-3.5 h-3.5" />
             <span>Manager</span>
           </button>
 
@@ -113,33 +113,36 @@ export const Navbar: React.FC = () => {
                 navigate('/developer');
               }
             }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
               role === 'developer'
-                ? 'bg-[#1A2332] text-[#F2F4F8] border border-[#2E3643] font-medium shadow-sm'
-                : 'text-[#96A0B0] hover:text-[#F2F4F8]'
+                ? 'bg-ivf-accent text-white shadow-sm'
+                : 'text-ivf-sec hover:text-ivf-pri'
             }`}
           >
-            <Code2 className="w-3.5 h-3.5 text-[#C5A059]" />
+            <Code2 className="w-3.5 h-3.5" />
             <span>Developer</span>
           </button>
         </div>
 
         {/* Engine Status Indicator */}
-        <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded bg-[#0E1116] border border-[#2E3643] text-xs text-[#96A0B0] font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F]"></span>
+        <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-ivf-bgAlt border border-ivf-border text-xs text-ivf-sec font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-ivf-green"></span>
           <span>Engine Active</span>
         </div>
+
+        {/* Ghost ambient decoration */}
+        <span className="ghost-float hidden xl:inline-block" aria-hidden="true">👻</span>
 
         {/* Notifications Popover */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifMenu(!showNotifMenu)}
-            className="relative p-2 rounded text-[#96A0B0] hover:text-[#F2F4F8] hover:bg-[#1E242E] border border-transparent hover:border-[#2E3643] transition-colors cursor-pointer"
+            className="relative p-2 rounded-lg text-ivf-sec hover:text-ivf-pri hover:bg-ivf-bgAlt border border-transparent hover:border-ivf-border transition-colors cursor-pointer"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-ivf-accent2" />
             )}
           </button>
 
@@ -150,15 +153,15 @@ export const Navbar: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-80 sm:w-96 rounded-md bg-[#161B22] border border-[#2E3643] shadow-lg py-2 z-50 text-[#F2F4F8]"
+                className="absolute right-0 mt-2 w-80 sm:w-96 rounded-lg bg-ivf-surface border border-ivf-border shadow-lg py-2 z-50 text-ivf-pri"
               >
-                <div className="px-4 py-2 border-b border-[#2E3643] flex items-center justify-between">
+                <div className="px-4 py-2 border-b border-ivf-border flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-serif font-medium text-[#F2F4F8] tracking-wide">
+                    <span className="text-xs font-semibold text-ivf-pri">
                       Notifications
                     </span>
                     {unreadCount > 0 && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#1A2332] text-[#C5A059] border border-[#2E3643] font-semibold">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-ivf-bgAlt text-ivf-accent2 border border-ivf-border font-semibold">
                         {unreadCount} unread
                       </span>
                     )}
@@ -166,16 +169,16 @@ export const Navbar: React.FC = () => {
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllNotificationsRead}
-                      className="text-xs text-[#C5A059] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                      className="text-xs text-ivf-accent hover:underline flex items-center gap-1 font-medium cursor-pointer"
                     >
                       <CheckCheck className="w-3.5 h-3.5" /> Mark all read
                     </button>
                   )}
                 </div>
 
-                <div className="max-h-80 overflow-y-auto divide-y divide-[#2E3643]/70">
+                <div className="max-h-80 overflow-y-auto divide-y divide-ivf-border/70">
                   {notifications.length === 0 ? (
-                    <p className="p-4 text-xs text-[#96A0B0] text-center">No notifications</p>
+                    <p className="p-4 text-xs text-ivf-sec text-center">No notifications</p>
                   ) : (
                     notifications.slice(0, 5).map((notif) => (
                       <div
@@ -187,26 +190,26 @@ export const Navbar: React.FC = () => {
                             setShowNotifMenu(false);
                           }
                         }}
-                        className={`p-3 hover:bg-[#1E242E] cursor-pointer transition-colors ${
-                          !notif.read ? 'bg-[#1D232C]/60' : ''
+                        className={`p-3 hover:bg-ivf-bgAlt cursor-pointer transition-colors ${
+                          !notif.read ? 'bg-ivf-bgAlt/50' : ''
                         }`}
                       >
                         <div className="flex items-start gap-2.5">
                           {notif.type === 'critical' ? (
-                            <ShieldAlert className="w-4 h-4 text-[#A63232] shrink-0 mt-0.5" />
+                            <ShieldAlert className="w-4 h-4 text-ivf-red shrink-0 mt-0.5" />
                           ) : notif.type === 'warning' ? (
-                            <Sparkles className="w-4 h-4 text-[#C5A059] shrink-0 mt-0.5" />
+                            <Sparkles className="w-4 h-4 text-ivf-amber shrink-0 mt-0.5" />
                           ) : (
-                            <ShieldCheck className="w-4 h-4 text-[#2D6A4F] shrink-0 mt-0.5" />
+                            <ShieldCheck className="w-4 h-4 text-ivf-green shrink-0 mt-0.5" />
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xs ${!notif.read ? 'font-medium text-[#F2F4F8]' : 'text-[#96A0B0]'}`}>
+                            <p className={`text-xs ${!notif.read ? 'font-semibold text-ivf-pri' : 'text-ivf-sec'}`}>
                               {notif.title}
                             </p>
-                            <p className="text-[11px] text-[#96A0B0] line-clamp-2 mt-0.5 leading-relaxed">
+                            <p className="text-[11px] text-ivf-sec line-clamp-2 mt-0.5 leading-relaxed">
                               {notif.message}
                             </p>
-                            <span className="text-[10px] text-[#687487] font-mono mt-1 block">
+                            <span className="text-[10px] text-ivf-sec font-mono mt-1 block">
                               {notif.timestamp}
                             </span>
                           </div>
@@ -216,11 +219,11 @@ export const Navbar: React.FC = () => {
                   )}
                 </div>
 
-                <div className="p-2 border-t border-[#2E3643] text-center">
+                <div className="p-2 border-t border-ivf-border text-center">
                   <Link
                     to="/notifications"
                     onClick={() => setShowNotifMenu(false)}
-                    className="text-xs text-[#C5A059] font-medium hover:underline transition-colors"
+                    className="text-xs text-ivf-accent font-medium hover:underline transition-colors"
                   >
                     View audit ledger →
                   </Link>
@@ -234,22 +237,22 @@ export const Navbar: React.FC = () => {
         <div className="relative" ref={userRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 p-1 rounded hover:bg-[#1E242E] border border-transparent hover:border-[#2E3643] transition-colors cursor-pointer"
+            className="flex items-center gap-2 p-1 rounded-lg hover:bg-ivf-bgAlt border border-transparent hover:border-ivf-border transition-colors cursor-pointer"
           >
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
-              className="w-7 h-7 rounded object-cover ring-1 ring-[#2E3643]"
+              className="w-7 h-7 rounded-lg object-cover ring-1 ring-ivf-border"
             />
             <div className="hidden lg:block text-left pr-1">
-              <p className="text-xs font-medium text-[#F2F4F8] leading-tight">
+              <p className="text-xs font-medium text-ivf-pri leading-tight">
                 {currentUser.name}
               </p>
-              <p className="text-[10px] text-[#96A0B0] leading-tight font-mono">
+              <p className="text-[10px] text-ivf-sec leading-tight font-mono">
                 {currentUser.role}
               </p>
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-[#96A0B0] hidden lg:block" />
+            <ChevronDown className="w-3.5 h-3.5 text-ivf-sec hidden lg:block" />
           </button>
 
           <AnimatePresence>
@@ -259,42 +262,42 @@ export const Navbar: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-56 rounded-md bg-[#161B22] border border-[#2E3643] shadow-lg py-1.5 z-50 text-[#F2F4F8]"
+                className="absolute right-0 mt-2 w-56 rounded-lg bg-ivf-surface border border-ivf-border shadow-lg py-1.5 z-50 text-ivf-pri"
               >
-                <div className="px-3 py-2 border-b border-[#2E3643]">
-                  <p className="text-xs font-serif font-medium text-[#F2F4F8]">{currentUser.name}</p>
-                  <p className="text-[11px] text-[#96A0B0] font-mono truncate">{currentUser.email}</p>
+                <div className="px-3 py-2 border-b border-ivf-border">
+                  <p className="text-xs font-semibold text-ivf-pri">{currentUser.name}</p>
+                  <p className="text-[11px] text-ivf-sec font-mono truncate">{currentUser.email}</p>
                 </div>
 
                 <div className="py-1">
                   <Link
                     to="/profile"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#F2F4F8] hover:bg-[#1E242E] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-pri hover:bg-ivf-bgAlt transition-colors"
                   >
-                    <User className="w-3.5 h-3.5 text-[#96A0B0]" /> Account Profile
+                    <User className="w-3.5 h-3.5 text-ivf-sec" /> Account Profile
                   </Link>
                   <Link
                     to="/settings"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#F2F4F8] hover:bg-[#1E242E] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-pri hover:bg-ivf-bgAlt transition-colors"
                   >
-                    <SettingsIcon className="w-3.5 h-3.5 text-[#96A0B0]" /> Model Configuration
+                    <SettingsIcon className="w-3.5 h-3.5 text-ivf-sec" /> Model Configuration
                   </Link>
                   <Link
                     to="/repositories"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#F2F4F8] hover:bg-[#1E242E] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-pri hover:bg-ivf-bgAlt transition-colors"
                   >
-                    <FolderGit2 className="w-3.5 h-3.5 text-[#96A0B0]" /> Git Integrations
+                    <FolderGit2 className="w-3.5 h-3.5 text-ivf-sec" /> Git Integrations
                   </Link>
                 </div>
 
-                <div className="pt-1 border-t border-[#2E3643]">
+                <div className="pt-1 border-t border-ivf-border">
                   <Link
                     to="/login"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-[#A63232] hover:bg-[#A63232]/10 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-red hover:bg-red-50 transition-colors"
                   >
                     <LogOut className="w-3.5 h-3.5" /> Sign Out
                   </Link>

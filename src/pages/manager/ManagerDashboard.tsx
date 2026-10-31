@@ -12,18 +12,6 @@ import {
   ArrowRight,
   ChevronRight
 } from 'lucide-react';
-import { 
-  AreaChart, 
-  Area, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  Cell
-} from 'recharts';
 import { RunningPumpkinCharge } from '../../components/halloween/RunningPumpkinCharge';
 
 export const ManagerDashboard: React.FC = () => {
@@ -45,22 +33,6 @@ export const ManagerDashboard: React.FC = () => {
     return b.riskScore - a.riskScore;
   }).slice(0, 5);
 
-  const chartData = [
-    { day: 'Mon', submissions: 14, approved: 10 },
-    { day: 'Tue', submissions: 22, approved: 18 },
-    { day: 'Wed', submissions: 19, approved: 16 },
-    { day: 'Thu', submissions: 28, approved: 23 },
-    { day: 'Fri', submissions: 32, approved: 26 },
-    { day: 'Sat', submissions: 9, approved: 8 },
-    { day: 'Sun', submissions: 12, approved: 11 },
-  ];
-
-  const severityData = [
-    { name: 'Critical', count: 18, color: '#A63232' },
-    { name: 'High', count: 27, color: '#B7791F' },
-    { name: 'Medium', count: 46, color: '#C5A059' },
-    { name: 'Low', count: 82, color: '#4E5A6C' },
-  ];
 
   const handleReviewPendingClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -204,111 +176,6 @@ export const ManagerDashboard: React.FC = () => {
         />
       </div>
 
-      {/* C & D. Throughput Charts & AI Severity Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Throughput Chart */}
-        <div className="lg:col-span-2 bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4 border-b border-[#2E3643] pb-3">
-            <div>
-              <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">
-                Weekly Throughput Ledger
-              </h2>
-              <p className="text-xs text-[#96A0B0] mt-0.5">
-                Automated AI screening submissions versus verified engineering authorizations
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-mono">
-              <div className="flex items-center gap-1.5 text-[#F2F4F8]">
-                <span className="w-2 h-2 rounded bg-[#1A2332] border border-[#2E3643]"></span>
-                <span>Submissions</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[#F2F4F8]">
-                <span className="w-2 h-2 rounded bg-[#C5A059]"></span>
-                <span>Authorized</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-64 w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorSub" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2A384F" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#2A384F" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="colorApp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#C5A059" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#C5A059" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E3643" vertical={false} />
-                <XAxis dataKey="day" stroke="#96A0B0" fontSize={11} tickLine={false} />
-                <YAxis stroke="#96A0B0" fontSize={11} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#161B22',
-                    borderColor: '#2E3643',
-                    borderRadius: '4px',
-                    color: '#F2F4F8',
-                    fontSize: '12px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
-                  }}
-                />
-                <Area type="monotone" dataKey="submissions" stroke="#4A6184" strokeWidth={1.5} fillOpacity={1} fill="url(#colorSub)" />
-                <Area type="monotone" dataKey="approved" stroke="#C5A059" strokeWidth={1.5} fillOpacity={1} fill="url(#colorApp)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Severity Distribution */}
-        <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">
-              Vulnerability Distribution
-            </h2>
-            <p className="text-xs text-[#96A0B0] mt-0.5">
-              Breakdown by detected risk severity
-            </p>
-          </div>
-
-          <div className="h-44 w-full my-3">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={severityData} layout="vertical" margin={{ top: 5, right: 15, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E3643" horizontal={false} />
-                <XAxis type="number" stroke="#96A0B0" fontSize={11} tickLine={false} />
-                <YAxis type="category" dataKey="name" stroke="#96A0B0" fontSize={11} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#161B22',
-                    borderColor: '#2E3643',
-                    borderRadius: '4px',
-                    color: '#F2F4F8',
-                    fontSize: '12px'
-                  }}
-                />
-                <Bar dataKey="count" radius={[0, 2, 2, 0]}>
-                  {severityData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5 pt-3 border-t border-[#2E3643] text-xs">
-            <div className="p-2.5 rounded bg-[#A63232]/10 border border-[#A63232]/30">
-              <span className="text-[#E06C75] text-[10px] font-mono uppercase tracking-wider font-semibold block">Critical Risks</span>
-              <span className="text-[#F2B5BC] font-serif text-base font-medium">18 findings</span>
-            </div>
-            <div className="p-2.5 rounded bg-[#B7791F]/10 border border-[#B7791F]/30">
-              <span className="text-[#D4AF67] text-[10px] font-mono uppercase tracking-wider font-semibold block">High Warnings</span>
-              <span className="text-[#F2E0BE] font-serif text-base font-medium">27 findings</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* E. Recent Submissions Requiring Attention Table */}
       <div className="bg-[#161B22] border border-[#2E3643] rounded overflow-hidden shadow-sm">

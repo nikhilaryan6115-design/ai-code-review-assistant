@@ -21,31 +21,31 @@ export const StatCard: React.FC<Props> = ({
   badge
 }) => {
   return (
-    <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 hover:border-[#3E495B] transition-colors shadow-sm group">
+    <div className="bg-ivf-surface border border-ivf-border rounded-lg p-5 hover:border-ivf-border/80 transition-colors shadow-[0_1px_4px_var(--color-shadow)] group">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-mono uppercase tracking-widest text-[#96A0B0]">{title}</span>
-        <div className="w-7 h-7 rounded bg-[#1D232C] border border-[#2E3643] flex items-center justify-center text-[#96A0B0] group-hover:text-[#C5A059] transition-colors">
+        <span className="text-[12px] text-ivf-sec font-medium">{title}</span>
+        <div className="w-7 h-7 rounded-lg bg-ivf-bgAlt border border-ivf-border flex items-center justify-center text-ivf-sec group-hover:text-ivf-accent transition-colors">
           <Icon className="w-3.5 h-3.5" />
         </div>
       </div>
 
       <div className="mt-3 flex items-baseline justify-between">
-        <span className="text-2xl sm:text-3xl font-serif font-medium tracking-tight text-[#F2F4F8]">
+        <span className="text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-ivf-pri">
           {value}
         </span>
         {badge && (
-          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-[#1D232C] border border-[#2E3643] text-[#96A0B0] uppercase tracking-wide">
+          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-ivf-bgAlt border border-ivf-border text-ivf-sec">
             {badge}
           </span>
         )}
       </div>
 
       {(change || subtitle) && (
-        <div className="mt-3 pt-2.5 border-t border-[#2E3643] flex items-center justify-between text-xs font-mono">
+        <div className="mt-3 pt-2.5 border-t border-ivf-border flex items-center justify-between text-xs font-mono">
           {change && (
             <span
               className={`inline-flex items-center font-medium ${
-                isPositive ? 'text-[#2D6A4F]' : 'text-[#A63232]'
+                isPositive ? 'text-ivf-green' : 'text-ivf-red'
               }`}
             >
               {isPositive ? (
@@ -57,7 +57,7 @@ export const StatCard: React.FC<Props> = ({
             </span>
           )}
           {subtitle && (
-            <span className="text-[#96A0B0] truncate text-[11px] ml-auto">{subtitle}</span>
+            <span className="text-ivf-sec truncate text-[11px] ml-auto">{subtitle}</span>
           )}
         </div>
       )}
