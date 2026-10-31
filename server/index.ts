@@ -27,7 +27,20 @@ initDatabase();
 // CORS configuration
 app.use(
   cors({
-    origin: [CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin)
+      if (!origin) return callback(null, true);
+      // Allow any Vercel preview or production deployment, localhost
+      if (
+        origin.endsWith('.vercel.app') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin === CLIENT_URL
+      ) {
+        return callback(null, true);
+      }
+      callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -67,9 +80,11 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`[RevAI Backend] Running on http://localhost:${PORT}`);
-  console.log(`[RevAI Webhook URL] http://localhost:${PORT}/api/webhooks/github`);
-});
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`[RevAI Backend] Running on http://localhost:${PORT}`);
+    console.log(`[RevAI Webhook URL] http://localhost:${PORT}/api/webhooks/github`);
+  });
+}
 
 export default app;

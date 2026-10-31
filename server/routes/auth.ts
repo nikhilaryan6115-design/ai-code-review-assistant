@@ -12,13 +12,15 @@ const JWT_SECRET = process.env.SESSION_SECRET || 'revai_dev_secret_key_change_in
  */
 authRouter.get('/github', (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  const baseUrl = process.env.CLIENT_URL || (host ? `${protocol}://${host}` : 'http://localhost:5173');
 
   if (!clientId) {
-    return res.redirect(`${clientUrl}/login?error=github_client_id_missing`);
+    return res.redirect(`${baseUrl}/login?error=github_client_id_missing`);
   }
 
-  const redirectUri = `${clientUrl}/api/auth/github/callback`;
+  const redirectUri = `${baseUrl}/api/auth/github/callback`;
   const scope = 'read:user,user:email,repo';
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     redirectUri
@@ -32,10 +34,12 @@ authRouter.get('/github', (req, res) => {
  */
 authRouter.get('/github/callback', async (req, res) => {
   const code = req.query.code as string;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  const baseUrl = process.env.CLIENT_URL || (host ? `${protocol}://${host}` : 'http://localhost:5173');
 
   if (!code) {
-    return res.redirect(`${clientUrl}/login?error=no_code_provided`);
+    return res.redirect(`${baseUrl}/login?error=no_code_provided`);
   }
 
   try {
@@ -93,16 +97,16 @@ authRouter.get('/github/callback', async (req, res) => {
 
     res.cookie('revai_session', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect(`${clientUrl}/?auth_success=true`);
+    res.redirect(`${baseUrl}/?auth_success=true`);
   } catch (err: any) {
     console.error('GitHub OAuth callback failed:', err.message);
-    res.redirect(`${clientUrl}/login?error=${encodeURIComponent(err.message)}`);
+    res.redirect(`${baseUrl}/login?error=${encodeURIComponent(err.message)}`);
   }
 });
 

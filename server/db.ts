@@ -6,7 +6,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbDir = path.resolve(__dirname, '../data');
+// Use /tmp on serverless environments (like Vercel read-only root) or local data/
+const dbDir = process.env.VERCEL
+  ? path.resolve('/tmp/revai-data')
+  : path.resolve(__dirname, '../data');
+
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
