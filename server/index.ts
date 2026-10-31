@@ -59,7 +59,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 // Health Check
-app.get('/api/health', (_req, res) => {
+app.get(['/api', '/api/health'], (_req, res) => {
   res.json({
     status: 'ok',
     platform: 'RevAI Code Review Platform',

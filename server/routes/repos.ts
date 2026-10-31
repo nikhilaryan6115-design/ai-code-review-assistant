@@ -20,8 +20,18 @@ function getCurrentUser(req: any) {
   const token = req.cookies?.revai_session || req.headers.authorization?.replace('Bearer ', '');
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { id: string };
-    return db.prepare('SELECT * FROM users WHERE id = ?').get(payload.id) as any;
+    const payload = jwt.verify(token, JWT_SECRET) as any;
+    const dbUser = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.id) as any;
+    if (dbUser) return dbUser;
+    return {
+      id: payload.id,
+      github_id: payload.githubId,
+      username: payload.username,
+      email: payload.email,
+      avatar_url: payload.avatar,
+      access_token: payload.accessToken,
+      role: payload.role || 'developer',
+    };
   } catch {
     return null;
   }

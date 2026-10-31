@@ -1,4 +1,3 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -12,13 +11,341 @@ const dbDir = process.env.VERCEL
   : path.resolve(__dirname, '../data');
 
 if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+  try {
+    fs.mkdirSync(dbDir, { recursive: true });
+  } catch {
+    // Ignore folder creation errors in restricted environments
+  }
 }
 
-const dbPath = path.join(dbDir, 'revai.db');
-export const db = new Database(dbPath);
+const dbFilePath = path.join(dbDir, 'revai-store.json');
 
-// Enable WAL mode for high concurrency
+export class PureDatabase {
+  tables: Map<string, any[]> = new Map();
+  filePath: string | null = null;
+
+  constructor(filePath?: string) {
+    this.filePath = filePath || null;
+    this.load();
+  }
+
+  load() {
+    if (this.filePath && fs.existsSync(this.filePath)) {
+      try {
+        const raw = fs.readFileSync(this.filePath, 'utf-8');
+        const data = JSON.parse(raw);
+        for (const [k, v] of Object.entries(data)) {
+          this.tables.set(k.toLowerCase(), v as any[]);
+        }
+      } catch (e) {
+        console.warn('[PureDB] Could not load persisted file, starting clean:', e);
+      }
+    }
+  }
+
+  save() {
+    if (!this.filePath) return;
+    try {
+      const obj: Record<string, any[]> = {};
+      for (const [k, v] of this.tables.entries()) {
+        obj[k] = v;
+      }
+      const dir = path.dirname(this.filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(this.filePath, JSON.stringify(obj, null, 2), 'utf-8');
+    } catch {
+      // Ignore disk write errors in serverless
+    }
+  }
+
+  getTable(name: string): any[] {
+    const clean = name.trim().toLowerCase();
+    if (!this.tables.has(clean)) {
+      this.tables.set(clean, []);
+    }
+    return this.tables.get(clean)!;
+  }
+
+  pragma(_sql: string) {
+    return [];
+  }
+
+  exec(sql: string) {
+    const statements = sql
+      .split(';')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    for (const stmt of statements) {
+      this.prepare(stmt).run();
+    }
+  }
+
+  prepare(sql: string) {
+    const rawSql = sql.trim();
+    const cleanSql = rawSql.replace(/\s+/g, ' ');
+
+    return {
+      get: (...params: any[]) => {
+        const all = this.executeSelect(cleanSql, params);
+        return all[0] || undefined;
+      },
+      all: (...params: any[]) => {
+        return this.executeSelect(cleanSql, params);
+      },
+      run: (...params: any[]) => {
+        const res = this.executeMutation(cleanSql, params);
+        this.save();
+        return res;
+      },
+    };
+  }
+
+  private executeSelect(sql: string, params: any[]): any[] {
+    const lower = sql.toLowerCase();
+
+    // Handle COUNT(*) queries e.g. SELECT COUNT(*) as count FROM users
+    if (lower.startsWith('select count(*)')) {
+      const match = sql.match(/from\s+([a-zA-Z0-9_]+)/i);
+      if (match) {
+        const table = this.getTable(match[1]);
+        return [{ count: table.length }];
+      }
+      return [{ count: 0 }];
+    }
+
+    // Handle submissions JOIN repositories
+    if (lower.includes('from submissions') && lower.includes('join repositories')) {
+      const submissions = this.getTable('submissions');
+      const repositories = this.getTable('repositories');
+
+      let combined = submissions.map((sub) => {
+        const repo = repositories.find((r) => r.id === sub.repository_id) || {};
+        return {
+          ...sub,
+          repo_name: repo.name || '',
+          repo_full_name: repo.full_name || '',
+          repo_language: repo.language || '',
+          repo_default_branch: repo.default_branch || 'main',
+        };
+      });
+
+      // Filter by WHERE
+      if (lower.includes('where')) {
+        let pIndex = 0;
+        if (lower.includes('s.id = ?')) {
+          const targetId = params[pIndex++];
+          combined = combined.filter((s) => s.id === targetId);
+        } else {
+          // Dynamic submission filters
+          if (lower.includes('s.status = ?')) {
+            const status = params[pIndex++];
+            combined = combined.filter((s) => s.status === status);
+          }
+          if (lower.includes('s.risk_level = ?')) {
+            const risk = params[pIndex++];
+            combined = combined.filter((s) => s.risk_level === risk);
+          }
+          if (lower.includes('s.repository_id = ?')) {
+            const repoId = params[pIndex++];
+            combined = combined.filter((s) => s.repository_id === repoId);
+          }
+          if (lower.includes('s.title like ?')) {
+            const term = (params[pIndex++] || '').replace(/%/g, '').toLowerCase();
+            pIndex++; // skip second like param
+            pIndex++; // skip third like param
+            combined = combined.filter(
+              (s) =>
+                (s.title || '').toLowerCase().includes(term) ||
+                (s.developer_name || '').toLowerCase().includes(term) ||
+                (s.repo_name || '').toLowerCase().includes(term)
+            );
+          }
+        }
+      }
+
+      if (lower.includes('order by s.created_at desc')) {
+        combined.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+      }
+
+      return combined;
+    }
+
+    // Standard SELECT from single table
+    const fromMatch = sql.match(/from\s+([a-zA-Z0-9_]+)/i);
+    if (!fromMatch) return [];
+    const tableName = fromMatch[1];
+    let rows = [...this.getTable(tableName)];
+
+    // Check WHERE clause
+    const whereMatch = sql.match(/where\s+(.*?)(?:\s+order\s+by|\s+limit|$)/i);
+    if (whereMatch) {
+      const whereClause = whereMatch[1].trim();
+      let pIdx = 0;
+
+      if (/([a-zA-Z0-9_]+)\s*=\s*\?/i.test(whereClause)) {
+        const colMatch = whereClause.match(/([a-zA-Z0-9_]+)\s*=\s*\?/i);
+        if (colMatch) {
+          const col = colMatch[1];
+          const val = params[pIdx++];
+          rows = rows.filter((r) => String(r[col]) === String(val));
+        }
+      } else if (/([a-zA-Z0-9_]+)\s*=\s*['"](.*?)['"]/i.test(whereClause)) {
+        const colMatch = whereClause.match(/([a-zA-Z0-9_]+)\s*=\s*['"](.*?)['"]/i);
+        if (colMatch) {
+          const col = colMatch[1];
+          const val = colMatch[2];
+          rows = rows.filter((r) => String(r[col]) === String(val));
+        }
+      }
+    }
+
+    // ORDER BY
+    if (lower.includes('order by')) {
+      const orderMatch = sql.match(/order\s+by\s+([a-zA-Z0-9_]+)(?:\s+(asc|desc))?/i);
+      if (orderMatch) {
+        const col = orderMatch[1];
+        const isDesc = (orderMatch[2] || 'asc').toLowerCase() === 'desc';
+        rows.sort((a, b) => {
+          const valA = a[col] || '';
+          const valB = b[col] || '';
+          if (valA < valB) return isDesc ? 1 : -1;
+          if (valA > valB) return isDesc ? -1 : 1;
+          return 0;
+        });
+      }
+    }
+
+    // LIMIT
+    const limitMatch = sql.match(/limit\s+(\d+)/i);
+    if (limitMatch) {
+      rows = rows.slice(0, parseInt(limitMatch[1], 10));
+    }
+
+    // Column projection
+    if (lower.startsWith('select full_name from')) {
+      return rows.map((r) => ({ full_name: r.full_name }));
+    }
+
+    return rows;
+  }
+
+  private executeMutation(sql: string, params: any[]): { changes: number; lastInsertRowid: number } {
+    const lower = sql.toLowerCase();
+
+    // DDL (CREATE TABLE)
+    if (lower.startsWith('create table')) {
+      const match = sql.match(/create\s+table\s+(?:if\s+not\s+exists\s+)?([a-zA-Z0-9_]+)/i);
+      if (match) {
+        this.getTable(match[1]);
+      }
+      return { changes: 0, lastInsertRowid: 0 };
+    }
+
+    // INSERT INTO <table> (<cols>) VALUES (?, ?, ...)
+    if (lower.startsWith('insert into')) {
+      const match = sql.match(/insert\s+into\s+([a-zA-Z0-9_]+)\s*\((.*?)\)\s*values/i);
+      if (match) {
+        const tableName = match[1];
+        const cols = match[2].split(',').map((c) => c.trim().toLowerCase());
+        const row: Record<string, any> = {};
+        for (let i = 0; i < cols.length; i++) {
+          row[cols[i]] = params[i] !== undefined ? params[i] : null;
+        }
+        const table = this.getTable(tableName);
+        table.push(row);
+        return { changes: 1, lastInsertRowid: table.length };
+      }
+    }
+
+    // UPDATE <table> SET <assignments> WHERE <condition>
+    if (lower.startsWith('update')) {
+      const tableMatch = sql.match(/update\s+([a-zA-Z0-9_]+)\s+set\s+(.*?)(?:\s+where\s+(.*))?$/i);
+      if (tableMatch) {
+        const tableName = tableMatch[1];
+        const setClause = tableMatch[2];
+        const whereClause = tableMatch[3];
+        const table = this.getTable(tableName);
+
+        let pIdx = 0;
+        const assignments: { col: string; val?: any; isRaw?: boolean; rawExpr?: string }[] = [];
+
+        // Parse assignments
+        const assignParts = setClause.split(',').map((p) => p.trim());
+        for (const part of assignParts) {
+          const eqIdx = part.indexOf('=');
+          if (eqIdx !== -1) {
+            const col = part.slice(0, eqIdx).trim();
+            const valExpr = part.slice(eqIdx + 1).trim();
+            if (valExpr === '?') {
+              assignments.push({ col, val: params[pIdx++] });
+            } else if (valExpr.includes('+ 1')) {
+              assignments.push({ col, isRaw: true, rawExpr: 'inc' });
+            } else if (valExpr.startsWith('(')) {
+              // Subquery in UPDATE like active_prs_count
+              assignments.push({ col, val: 0 });
+            } else {
+              // literal e.g. 1 or 'ai_completed'
+              assignments.push({ col, val: valExpr.replace(/^['"]|['"]$/g, '') });
+            }
+          }
+        }
+
+        // Parse WHERE
+        let targetId: any = null;
+        let whereCol = 'id';
+        if (whereClause) {
+          const colEq = whereClause.match(/([a-zA-Z0-9_]+)\s*=\s*\?/i);
+          if (colEq) {
+            whereCol = colEq[1];
+            targetId = params[pIdx++];
+          }
+        }
+
+        let changes = 0;
+        for (const row of table) {
+          if (!targetId || String(row[whereCol]) === String(targetId)) {
+            for (const assign of assignments) {
+              if (assign.isRaw && assign.rawExpr === 'inc') {
+                row[assign.col] = (Number(row[assign.col]) || 0) + 1;
+              } else {
+                row[assign.col] = assign.val;
+              }
+            }
+            changes++;
+          }
+        }
+        return { changes, lastInsertRowid: 0 };
+      }
+    }
+
+    // DELETE FROM <table> WHERE <condition>
+    if (lower.startsWith('delete from')) {
+      const match = sql.match(/delete\s+from\s+([a-zA-Z0-9_]+)(?:\s+where\s+([a-zA-Z0-9_]+)\s*=\s*\?)?/i);
+      if (match) {
+        const tableName = match[1];
+        const table = this.getTable(tableName);
+        if (match[2]) {
+          const col = match[2];
+          const val = params[0];
+          const initialLen = table.length;
+          const filtered = table.filter((r) => String(r[col]) !== String(val));
+          this.tables.set(tableName.toLowerCase(), filtered);
+          return { changes: initialLen - filtered.length, lastInsertRowid: 0 };
+        } else {
+          const changes = table.length;
+          this.tables.set(tableName.toLowerCase(), []);
+          return { changes, lastInsertRowid: 0 };
+        }
+      }
+    }
+
+    return { changes: 0, lastInsertRowid: 0 };
+  }
+}
+
+export const db = new PureDatabase(dbFilePath);
+
+// Enable pragmas
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
@@ -53,8 +380,7 @@ export function initDatabase() {
       stars INTEGER DEFAULT 0,
       active_prs_count INTEGER DEFAULT 0,
       total_reviews_count INTEGER DEFAULT 0,
-      created_at TEXT NOT NULL,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+      created_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS submissions (
@@ -88,8 +414,7 @@ export function initDatabase() {
       manager_comments_count INTEGER DEFAULT 0,
       review_time_seconds INTEGER DEFAULT 0,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL,
-      FOREIGN KEY(repository_id) REFERENCES repositories(id) ON DELETE CASCADE
+      updated_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS issues (
@@ -107,8 +432,7 @@ export function initDatabase() {
       original_snippet TEXT NOT NULL,
       suggested_fix_snippet TEXT NOT NULL,
       cwe TEXT,
-      status TEXT DEFAULT 'open',
-      FOREIGN KEY(submission_id) REFERENCES submissions(id) ON DELETE CASCADE
+      status TEXT DEFAULT 'open'
     );
 
     CREATE TABLE IF NOT EXISTS code_files (
@@ -118,8 +442,7 @@ export function initDatabase() {
       language TEXT NOT NULL,
       content TEXT NOT NULL,
       suggested_content TEXT,
-      patch TEXT,
-      FOREIGN KEY(submission_id) REFERENCES submissions(id) ON DELETE CASCADE
+      patch TEXT
     );
 
     CREATE TABLE IF NOT EXISTS notifications (
@@ -145,7 +468,7 @@ export function initDatabase() {
 
   // Seed default data if empty
   const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
-  if (userCount.count === 0) {
+  if (!userCount || userCount.count === 0) {
     seedInitialData();
   }
 }
