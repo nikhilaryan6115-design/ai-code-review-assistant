@@ -11,7 +11,11 @@ const JWT_SECRET = process.env.SESSION_SECRET || 'revai_dev_secret_key_change_in
  * Start GitHub OAuth authorization
  */
 authRouter.get('/github', (req, res) => {
-  const clientId = process.env.GITHUB_CLIENT_ID;
+  let clientId = (process.env.GITHUB_CLIENT_ID || '').trim();
+  // Auto-correct common typo where capital letter O is typed or copied as digit 0 in Ov23 prefix
+  if (/^0v23/i.test(clientId)) {
+    clientId = 'O' + clientId.slice(1);
+  }
   const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
   const host = req.headers['x-forwarded-host'] || req.get('host');
   const baseUrl = process.env.CLIENT_URL || (host ? `${protocol}://${host}` : 'http://localhost:5173');

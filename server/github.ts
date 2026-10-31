@@ -57,8 +57,11 @@ export function verifyWebhookSignature(
  * Exchange OAuth temporary code for access token
  */
 export async function exchangeCodeForToken(code: string): Promise<string> {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  let clientId = (process.env.GITHUB_CLIENT_ID || '').trim();
+  if (/^0v23/i.test(clientId)) {
+    clientId = 'O' + clientId.slice(1);
+  }
+  const clientSecret = (process.env.GITHUB_CLIENT_SECRET || '').trim();
 
   if (!clientId || !clientSecret) {
     throw new Error('GitHub OAuth is not configured: GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET missing.');
