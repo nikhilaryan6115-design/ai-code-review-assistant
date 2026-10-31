@@ -35,6 +35,7 @@ interface AppContextType {
     role: string;
     isGitHubAuth?: boolean;
     githubUsername?: string;
+    isAuthenticated?: boolean;
   };
   submissions: Submission[];
   repositories: Repository[];
@@ -112,27 +113,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const currentUser = backendUser
     ? {
         id: backendUser.id,
-        name: backendUser.name || backendUser.github_username || 'GitHub Engineer',
-        email: backendUser.email || `${backendUser.github_username}@github.internal`,
-        avatar: backendUser.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        name: backendUser.name || backendUser.username || 'GitHub Engineer',
+        email: backendUser.email || `${backendUser.username}@users.noreply.github.com`,
+        avatar: backendUser.avatar || 'https://avatars.githubusercontent.com/u/0?v=4',
         role: backendUser.role === 'developer' ? 'Senior Software Engineer' : 'Director of Engineering',
         isGitHubAuth: true,
-        githubUsername: backendUser.github_username,
-      }
-    : role === 'manager'
-    ? {
-        name: 'Sarah Jenkins',
-        email: 'sarah.jenkins@acme-corp.internal',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        role: 'Director of Engineering',
-        isGitHubAuth: false,
+        githubUsername: backendUser.username,
+        isAuthenticated: true,
       }
     : {
-        name: 'Rahul Sharma',
-        email: 'rahul.sharma@acme-corp.internal',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        role: 'Backend Engineer',
+        id: undefined,
+        name: 'Guest Engineer',
+        email: 'guest@revai.local',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        role: 'Guest',
         isGitHubAuth: false,
+        isAuthenticated: false,
       };
 
   const addToast = (title: string, message: string, type: Toast['type'] = 'info') => {

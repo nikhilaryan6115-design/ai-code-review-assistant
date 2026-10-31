@@ -21,18 +21,6 @@ export const LoginPage: React.FC = () => {
     navigate('/manager');
   };
 
-  const loginAsManager = () => {
-    setRole('manager');
-    addToast('Signed In', 'Viewing workspace as Sarah Jenkins (Director of Engineering).', 'success');
-    navigate('/manager');
-  };
-
-  const loginAsDeveloper = () => {
-    setRole('developer');
-    addToast('Signed In', 'Viewing workspace as Rahul Sharma (Backend Engineer).', 'success');
-    navigate('/developer');
-  };
-
   return (
     <div className="min-h-screen bg-editorial-bg flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 bg-editorial-surface border border-editorial-border rounded-md overflow-hidden shadow-editorial-card">
@@ -90,66 +78,40 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Sign-in Form & Persona Toggles */}
+        {/* Right Side: Primary GitHub Authentication & Credentials */}
         <div className="lg:col-span-7 p-8 flex flex-col justify-center space-y-6">
           <div>
             <h2 className="text-xl font-serif font-normal text-[#F2F4F8] tracking-tight">
               {isRegister ? 'Create an Engineering Account' : 'Sign in to RevAI'}
             </h2>
             <p className="text-xs text-editorial-slate mt-1">
-              Select an engineering role below for instant demo access, or sign in with workspace credentials.
+              Connect with your personal GitHub account to inspect live repositories and review collaborator pull requests.
             </p>
           </div>
 
-          {/* Demo 1-Click Access Cards */}
-          <div className="p-4 rounded bg-editorial-subtle/30 border border-editorial-border space-y-2.5">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-editorial-brass font-medium block">
-              Quick Role Switcher
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={loginAsManager}
-                className="p-3 rounded bg-editorial-surface hover:bg-editorial-subtle border border-editorial-border hover:border-editorial-brass/40 text-left transition-editorial cursor-pointer group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#F2F4F8] group-hover:text-editorial-brass transition-colors">
-                    Director of Engineering
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-editorial-muted group-hover:text-editorial-brass transition-colors" />
-                </div>
-                <span className="text-[11px] text-editorial-muted block mt-1">
-                  Sarah Jenkins (Triage & Sign-off)
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={loginAsDeveloper}
-                className="p-3 rounded bg-editorial-surface hover:bg-editorial-subtle border border-editorial-border hover:border-editorial-brass/40 text-left transition-editorial cursor-pointer group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#F2F4F8] group-hover:text-editorial-brass transition-colors">
-                    Senior Software Engineer
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-editorial-muted group-hover:text-editorial-brass transition-colors" />
-                </div>
-                <span className="text-[11px] text-editorial-muted block mt-1">
-                  Rahul Sharma (Code Patches & Diffs)
-                </span>
-              </button>
-            </div>
+          {/* Real GitHub OAuth Primary Button */}
+          <div className="space-y-2">
+            <a
+              href="/api/auth/github"
+              className="w-full flex items-center justify-center gap-2.5 py-3 rounded bg-editorial-brass hover:bg-editorial-brass/90 text-editorial-bg text-xs font-semibold tracking-wide transition-editorial shadow-editorial-card cursor-pointer text-center"
+            >
+              <Github className="w-4 h-4 text-editorial-bg" />
+              <span>Continue with GitHub</span>
+            </a>
+            <p className="text-[11px] font-mono text-center text-editorial-muted">
+              Authenticates securely via GitHub OAuth 2.0
+            </p>
           </div>
 
           {/* Divider */}
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex items-center justify-center py-1">
             <div className="border-t border-editorial-border w-full"></div>
             <span className="bg-editorial-surface px-3 text-[10px] font-mono text-editorial-muted uppercase tracking-widest absolute">
-              or continue with email
+              or continue with workspace email
             </span>
           </div>
 
-          {/* Form */}
+          {/* Email / Password Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-[11px] font-mono uppercase tracking-wider text-editorial-muted mb-1.5 font-medium">
@@ -192,20 +154,11 @@ export const LoginPage: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded bg-editorial-brass hover:bg-editorial-brass/90 text-editorial-bg text-xs font-semibold tracking-wide transition-editorial shadow-editorial-card cursor-pointer"
+              className="w-full py-2.5 rounded bg-editorial-surface hover:bg-editorial-subtle text-[#F2F4F8] text-xs font-medium border border-editorial-border hover:border-editorial-brass/40 transition-editorial cursor-pointer"
             >
-              {isRegister ? 'Create Workspace Account' : 'Sign In to Workspace'}
+              {isRegister ? 'Register Workspace Account' : 'Sign In with Password'}
             </button>
           </form>
-
-          {/* GitHub Auth option */}
-          <a
-            href="/api/auth/github"
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded bg-editorial-surface hover:bg-editorial-subtle text-[#F2F4F8] text-xs font-medium border border-editorial-border hover:border-editorial-brass/40 transition-editorial cursor-pointer text-center"
-          >
-            <Github className="w-4 h-4 text-editorial-brass" />
-            <span>Continue with GitHub</span>
-          </a>
 
           <div className="text-center pt-1">
             <button

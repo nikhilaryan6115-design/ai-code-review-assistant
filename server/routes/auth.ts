@@ -12,13 +12,13 @@ const JWT_SECRET = process.env.SESSION_SECRET || 'revai_dev_secret_key_change_in
  */
 authRouter.get('/github', (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
   if (!clientId) {
-    return res.status(500).json({
-      error: 'GitHub OAuth Client ID is not configured. Set GITHUB_CLIENT_ID in .env',
-    });
+    return res.redirect(`${clientUrl}/login?error=github_client_id_missing`);
   }
 
-  const redirectUri = `${req.protocol}://${req.get('host')}/api/auth/github/callback`;
+  const redirectUri = `${clientUrl}/api/auth/github/callback`;
   const scope = 'read:user,user:email,repo';
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     redirectUri
@@ -112,22 +112,7 @@ authRouter.get('/me', (req, res) => {
   const token = req.cookies?.revai_session || req.headers.authorization?.replace('Bearer ', '');
 
   if (!token) {
-    // Return default active demo user so demo experience works out of the box
-    const defaultUser = db.prepare('SELECT * FROM users WHERE role = ? LIMIT 1').get('manager') as any;
-    if (defaultUser) {
-      return res.json({
-        user: {
-          id: defaultUser.id,
-          username: defaultUser.username,
-          name: defaultUser.username === 'sarahjenkins' ? 'Sarah Jenkins' : defaultUser.username,
-          email: defaultUser.email,
-          avatar: defaultUser.avatar_url,
-          role: defaultUser.role,
-          isGitHubConnected: Boolean(defaultUser.access_token),
-        },
-      });
-    }
-    return res.status(401).json({ error: 'Not authenticated' });
+    return res.status(401).json({ error: 'Not authenticated', authenticated: false });
   }
 
   try {
@@ -136,14 +121,15 @@ authRouter.get('/me', (req, res) => {
 
     if (!user) {
       res.clearCookie('revai_session');
-      return res.status(401).json({ error: 'User no longer exists' });
+      return res.status(401).json({ error: 'User no longer exists', authenticated: false });
     }
 
     res.json({
+      authenticated: true,
       user: {
         id: user.id,
         username: user.username,
-        name: user.username === 'sarahjenkins' ? 'Sarah Jenkins' : user.username === 'rahulsharma' ? 'Rahul Sharma' : user.username,
+        name: user.username,
         email: user.email,
         avatar: user.avatar_url,
         role: user.role,
@@ -152,7 +138,7 @@ authRouter.get('/me', (req, res) => {
     });
   } catch {
     res.clearCookie('revai_session');
-    res.status(401).json({ error: 'Invalid or expired session' });
+    res.status(401).json({ error: 'Invalid or expired session', authenticated: false });
   }
 });
 

@@ -294,13 +294,18 @@ export const Navbar: React.FC = () => {
                 </div>
 
                 <div className="pt-1 border-t border-ivf-border">
-                  <Link
-                    to="/login"
-                    onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-red hover:bg-red-50 transition-colors"
+                  <button
+                    onClick={async () => {
+                      setShowUserMenu(false);
+                      try {
+                        await fetch('/api/auth/logout', { method: 'POST' });
+                      } catch {}
+                      window.location.href = '/login';
+                    }}
+                    className="w-full text-left flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-red hover:bg-red-50 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" /> Sign Out
-                  </Link>
+                  </button>
                 </div>
               </motion.div>
             )}
