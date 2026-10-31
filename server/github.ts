@@ -57,11 +57,22 @@ export function verifyWebhookSignature(
  * Exchange OAuth temporary code for access token
  */
 export async function exchangeCodeForToken(code: string): Promise<string> {
-  let clientId = (process.env.GITHUB_CLIENT_ID || '').trim();
+  let clientId = (
+    process.env.GITHUB_CLIENT_ID ||
+    process.env.CLIENT_ID ||
+    process.env.GH_CLIENT_ID ||
+    ''
+  ).trim();
   if (/^0v23/i.test(clientId)) {
     clientId = 'O' + clientId.slice(1);
   }
-  const clientSecret = (process.env.GITHUB_CLIENT_SECRET || '').trim();
+  const clientSecret = (
+    process.env.GITHUB_CLIENT_SECRET ||
+    process.env.GITHUB_SECRET ||
+    process.env.CLIENT_SECRET ||
+    process.env.GH_CLIENT_SECRET ||
+    ''
+  ).trim();
 
   if (!clientId || !clientSecret) {
     throw new Error('GitHub OAuth is not configured: GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET missing.');

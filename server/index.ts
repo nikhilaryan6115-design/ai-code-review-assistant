@@ -63,6 +63,17 @@ app.get(['/api', '/api/health'], (_req, res) => {
   res.json({
     status: 'ok',
     platform: 'RevAI Code Review Platform',
+    envCheck: {
+      hasClientId: Boolean(process.env.GITHUB_CLIENT_ID || process.env.CLIENT_ID || process.env.GH_CLIENT_ID),
+      hasClientSecret: Boolean(
+        process.env.GITHUB_CLIENT_SECRET ||
+        process.env.GITHUB_SECRET ||
+        process.env.CLIENT_SECRET ||
+        process.env.GH_CLIENT_SECRET
+      ),
+      hasClientUrl: Boolean(process.env.CLIENT_URL),
+      hasSessionSecret: Boolean(process.env.SESSION_SECRET),
+    },
     timestamp: new Date().toISOString(),
   });
 });
