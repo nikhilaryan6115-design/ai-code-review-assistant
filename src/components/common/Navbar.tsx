@@ -17,6 +17,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RevAILogo } from '../brand/RevAILogo';
 
 export const Navbar: React.FC = () => {
   const { 
@@ -56,17 +57,16 @@ export const Navbar: React.FC = () => {
       {/* Left: Brand & Search */}
       <div className="flex items-center gap-6">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 rounded border border-ivf-border bg-ivf-bgAlt flex items-center justify-center text-ivf-accent">
-            <span className="font-sans font-bold text-sm leading-none">R</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-sans text-lg font-semibold tracking-tight text-ivf-pri">
-              Rev<span className="text-ivf-accent2">AI</span>
-            </span>
-            <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider bg-ivf-bgAlt text-ivf-sec border border-ivf-border uppercase font-medium">
-              Qwen2.5-Coder 7B
-            </span>
-          </div>
+          <RevAILogo
+            layout="full"
+            size="sm"
+            showBadge={true}
+            animated={true}
+            theme="light"
+          />
+          <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider bg-ivf-bgAlt text-ivf-sec border border-ivf-border uppercase font-medium ml-1">
+            Qwen2.5-Coder 7B
+          </span>
         </Link>
 
         {/* Global Search Bar */}

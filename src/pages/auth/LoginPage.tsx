@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { Github, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 import { CrescentMoonSVG } from '../../components/halloween/MoonSVG';
 import { PumpkinSVG } from '../../components/halloween/PumpkinSVG';
+import { RevAILogo } from '../../components/brand/RevAILogo';
 
 export const LoginPage: React.FC = () => {
   const { setRole, addToast } = useApp();
@@ -40,19 +41,14 @@ export const LoginPage: React.FC = () => {
         <div className="lg:col-span-5 p-8 bg-editorial-subtle/40 border-b lg:border-b-0 lg:border-r border-editorial-border flex flex-col justify-between space-y-8">
           <div>
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded bg-editorial-navy border border-editorial-border flex items-center justify-center text-editorial-brass">
-                <span className="font-serif font-bold text-base text-editorial-brass">R</span>
-              </div>
-              <div>
-                <span className="font-serif font-medium text-lg tracking-tight text-[#F2F4F8]">
-                  Rev<span className="text-editorial-brass font-normal">AI</span>
-                </span>
-                <span className="block text-[10px] font-mono tracking-widest uppercase text-editorial-muted">
-                  Code Review Assistant
-                </span>
-              </div>
-            </div>
+            <RevAILogo
+              layout="full"
+              size="md"
+              showBadge={true}
+              animated={true}
+              theme="dark"
+              subtitle="Code Review Assistant"
+            />
 
             {/* Description */}
             <div className="mt-8 space-y-3">

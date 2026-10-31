@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { RevAILogo } from '../brand/RevAILogo';
 
 interface Props {
   isActive: boolean;
@@ -20,10 +21,10 @@ export const RunningPumpkinCharge: React.FC<Props> = ({
 
     setPhase('transition');
 
-    // Tasteful, gentle 220ms page transition
+    // Tasteful, gentle loading transition with brand identity
     const timer = setTimeout(() => {
       onComplete();
-    }, 220);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [isActive, onComplete]);
@@ -32,15 +33,13 @@ export const RunningPumpkinCharge: React.FC<Props> = ({
 
   return (
     <div 
-      className={`fixed inset-0 z-50 pointer-events-auto bg-[#0E1116] transition-opacity duration-200 ${
-        phase === 'transition' ? 'opacity-90' : 'opacity-0'
-      } flex items-center justify-center`}
+      className={`fixed inset-0 z-50 pointer-events-auto bg-ivf-bg/95 backdrop-blur-xs transition-opacity duration-200 ${
+        phase === 'transition' ? 'opacity-100' : 'opacity-0'
+      } flex flex-col items-center justify-center gap-3 select-none`}
       aria-live="polite"
     >
-      <div className="flex items-center gap-3 text-xs font-mono text-[#96A0B0]">
-        <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-pulse"></span>
-        <span>Loading Submissions Ledger...</span>
-      </div>
+      <RevAILogo layout="full" size="md" showBadge={true} animated={true} theme="light" />
+      <span className="text-xs font-mono text-ivf-sec">Loading Submissions Ledger...</span>
     </div>
   );
 };

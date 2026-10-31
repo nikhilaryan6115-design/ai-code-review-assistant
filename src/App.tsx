@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { Sidebar } from './components/common/Sidebar';
 import { ToastContainer } from './components/common/ToastContainer';
+import { LoadingScreen } from './components/common/LoadingScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Manager Pages
@@ -79,8 +80,13 @@ const IndexRedirect: React.FC = () => {
 };
 
 export const App: React.FC = () => {
+  const [isAppLoading, setIsAppLoading] = useState(true);
+
   return (
     <AppProvider>
+      {isAppLoading && (
+        <LoadingScreen onComplete={() => setIsAppLoading(false)} />
+      )}
       <BrowserRouter>
         <Routes>
           {/* Public Auth */}
