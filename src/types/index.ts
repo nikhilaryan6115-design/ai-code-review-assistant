@@ -35,6 +35,10 @@ export interface CodeFile {
   language: string;
   content: string;
   suggestedContent?: string;
+  patch?: string;
+  status?: string; // 'added' | 'modified' | 'removed' | 'renamed'
+  additions?: number;
+  deletions?: number;
   problematicLines: {
     line: number;
     severity: Severity;

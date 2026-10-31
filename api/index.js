@@ -2144,6 +2144,7 @@ reposRouter.post("/:id/sync", async (req, res) => {
 // server/routes/submissions.ts
 import { Router as Router3 } from "express";
 var submissionsRouter = Router3();
+var JWT_SECRET3 = process.env.SESSION_SECRET || "revai_dev_secret_key_change_in_production_32";
 submissionsRouter.get("/", (req, res) => {
   const { repository, developer, status, search } = req.query;
   let query = `
@@ -2314,6 +2315,10 @@ submissionsRouter.get("/:id", (req, res) => {
       language: cf.language,
       content: cf.content,
       suggestedContent: cf.suggested_content,
+      patch: cf.patch,
+      status: cf.status,
+      additions: cf.additions,
+      deletions: cf.deletions,
       problematicLines: issues.filter((i) => i.file === cf.filename).map((i) => ({
         line: i.line_start,
         severity: i.severity,

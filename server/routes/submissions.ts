@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import { db } from '../db';
 import { analyzeCodeDiff } from '../ai';
-import { postReviewComment } from '../github';
+import { postReviewComment, getPullRequestFiles } from '../github';
 
 export const submissionsRouter = Router();
+
+const JWT_SECRET = process.env.SESSION_SECRET || 'revai_dev_secret_key_change_in_production_32';
 
 /**
  * Get all pull request submissions
@@ -200,6 +203,10 @@ submissionsRouter.get('/:id', (req, res) => {
       language: cf.language,
       content: cf.content,
       suggestedContent: cf.suggested_content,
+      patch: cf.patch,
+      status: cf.status,
+      additions: cf.additions,
+      deletions: cf.deletions,
       problematicLines: issues
         .filter((i) => i.file === cf.filename)
         .map((i) => ({

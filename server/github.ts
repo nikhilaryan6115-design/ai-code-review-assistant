@@ -220,6 +220,36 @@ export async function getPullRequestDiff(
 }
 
 /**
+ * Fetch individual changed files for a pull request from GitHub
+ */
+export async function getPullRequestFiles(
+  owner: string,
+  repo: string,
+  pullNumber: number,
+  token?: string
+): Promise<Array<{ filename: string; status: string; additions: number; deletions: number; patch?: string }>> {
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github.v3+json',
+    'User-Agent': 'RevAI-Code-Review-Platform',
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/files`, {
+      headers,
+    });
+    if (!res.ok) {
+      return [];
+    }
+    return (await res.json()) as any[];
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Publish review summary comment to GitHub Pull Request
  */
 export async function postReviewComment(

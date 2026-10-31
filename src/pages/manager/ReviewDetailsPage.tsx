@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { CodeViewer } from '../../components/code/CodeViewer';
@@ -6,6 +6,7 @@ import { IssueCard } from '../../components/code/IssueCard';
 import { RiskBadge } from '../../components/common/RiskBadge';
 import { StatusBadge } from '../../components/common/StatusBadge';
 import { DecisionModal } from '../../components/modals/DecisionModal';
+import { Submission } from '../../types';
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -13,7 +14,8 @@ import {
   RefreshCw, 
   Sparkles, 
   MessageSquare, 
-  Send
+  Send,
+  Loader2
 } from 'lucide-react';
 
 export const ReviewDetailsPage: React.FC = () => {
@@ -26,6 +28,10 @@ export const ReviewDetailsPage: React.FC = () => {
     dismissIssue 
   } = useApp();
 
+  const [detail, setDetail] = useState<Submission | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+
   const [selectedIssueId, setSelectedIssueId] = useState<string | undefined>();
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,9 +42,48 @@ export const ReviewDetailsPage: React.FC = () => {
     'Please address line 42 SQL concatenation issue prior to authorization.'
   ]);
 
-  const submission = submissions.find((s) => s.id === id);
+  // Fetch the full submission detail (includes codeFiles with content)
+  useEffect(() => {
+    if (!id) return;
+    setLoadingDetail(true);
+    setFetchError(false);
 
-  if (!submission) {
+    fetch(`/api/submissions/${id}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data) => {
+        if (data?.submission) {
+          setDetail(data.submission);
+        } else {
+          // Fallback to list data (codeFiles will be empty but at least metadata shows)
+          const found = submissions.find((s) => s.id === id);
+          if (found) setDetail(found);
+          else setFetchError(true);
+        }
+      })
+      .catch(() => {
+        // Fallback to context list data
+        const found = submissions.find((s) => s.id === id);
+        if (found) setDetail(found);
+        else setFetchError(true);
+      })
+      .finally(() => setLoadingDetail(false));
+  }, [id]);
+
+  // Loading state
+  if (loadingDetail) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] space-x-3 text-[#96A0B0]">
+        <Loader2 className="w-5 h-5 animate-spin text-[#C5A059]" />
+        <span className="text-sm font-mono">Fetching inspection record…</span>
+      </div>
+    );
+  }
+
+  // Not found state
+  if (fetchError || !detail) {
     return (
       <div className="p-8 text-center space-y-4 max-w-md mx-auto">
         <h2 className="text-lg font-serif font-medium text-[#F2F4F8]">Submission Not Located</h2>
@@ -52,6 +97,8 @@ export const ReviewDetailsPage: React.FC = () => {
       </div>
     );
   }
+
+  const submission = detail;
 
   const handleOpenDecision = (type: 'approve' | 'request_changes') => {
     setDecisionType(type);
@@ -77,7 +124,7 @@ export const ReviewDetailsPage: React.FC = () => {
   const qualityCount = submission.issues.filter((i) => i.category === 'quality').length;
 
   return (
-    <div className="space-y-6 pb-12 max-w-7xl mx-auto">
+    <div className="space-y-4 pb-12">
       {/* Top Breadcrumb & Action Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2E3643] pb-4 bg-[#161B22] p-4 rounded shadow-sm">
         <div className="flex items-center gap-3">
@@ -130,12 +177,30 @@ export const ReviewDetailsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Grid: Details Sidebar & Code Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (5 cols): AI Findings & Review Metadata */}
-        <div className="lg:col-span-5 space-y-5">
+      {/* Main Layout: Code Inspector (Primary) + Sidebar (Secondary) */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-5 items-start">
+
+        {/* LEFT / PRIMARY: Full Interactive Code Viewer */}
+        <div className="min-w-0">
+          <CodeViewer
+            codeFiles={submission.codeFiles}
+            issues={submission.issues}
+            selectedIssueId={selectedIssueId}
+            onApplyFix={(issueId) => applyIssueFix(submission.id, issueId)}
+            onRetry={() => {
+              setLoadingDetail(true);
+              fetch(`/api/submissions/${id}`)
+                .then((r) => r.ok ? r.json() : null)
+                .then((data) => { if (data?.submission) setDetail(data.submission); })
+                .finally(() => setLoadingDetail(false));
+            }}
+          />
+        </div>
+
+        {/* RIGHT / SECONDARY: Metadata Sidebar */}
+        <div className="space-y-4 min-w-0">
           {/* 1. Developer & Submission Meta Card */}
-          <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm space-y-4">
+          <div className="bg-[#161B22] border border-[#2E3643] rounded p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-[#2E3643] pb-3">
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#96A0B0]">
                 Author Record
@@ -150,7 +215,7 @@ export const ReviewDetailsPage: React.FC = () => {
               <img
                 src={submission.developer.avatar}
                 alt={submission.developer.name}
-                className="w-10 h-10 rounded object-cover ring-1 ring-[#2E3643]"
+                className="w-9 h-9 rounded object-cover ring-1 ring-[#2E3643]"
               />
               <div>
                 <h2 className="text-sm font-serif font-medium text-[#F2F4F8]">{submission.developer.name}</h2>
@@ -159,25 +224,25 @@ export const ReviewDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5 pt-1 text-xs font-mono">
-              <div className="p-2.5 rounded bg-[#0E1116] border border-[#2E3643]">
+            <div className="grid grid-cols-2 gap-2 pt-1 text-xs font-mono">
+              <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[#96A0B0] text-[10px] block">Branch</span>
                 <span className="text-[#C5A059] font-medium truncate block">
                   {submission.repository.branch}
                 </span>
               </div>
-              <div className="p-2.5 rounded bg-[#0E1116] border border-[#2E3643]">
+              <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[#96A0B0] text-[10px] block">Language</span>
                 <span className="text-[#F2F4F8] font-medium">{submission.language}</span>
               </div>
-              <div className="p-2.5 rounded bg-[#0E1116] border border-[#2E3643]">
+              <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[#96A0B0] text-[10px] block">Diff Scope</span>
                 <span className="text-[#F2F4F8] font-medium">
                   <span className="text-[#4EAA78]">+{submission.additions}</span>{' '}
                   <span className="text-[#E06C75]">-{submission.deletions}</span>
                 </span>
               </div>
-              <div className="p-2.5 rounded bg-[#0E1116] border border-[#2E3643]">
+              <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[#96A0B0] text-[10px] block">Inspection Latency</span>
                 <span className="text-[#4EAA78] font-medium">
                   {submission.reviewTimeSeconds || 14}s
@@ -187,7 +252,7 @@ export const ReviewDetailsPage: React.FC = () => {
           </div>
 
           {/* 2. Overall Risk Assessment Meter */}
-          <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm space-y-3.5">
+          <div className="bg-[#161B22] border border-[#2E3643] rounded p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#96A0B0]">
                 Security & Risk Assessment
@@ -197,9 +262,8 @@ export const ReviewDetailsPage: React.FC = () => {
               </span>
             </div>
 
-            {/* Risk Progress Bar */}
             <div>
-              <div className="w-full h-2 bg-[#0E1116] rounded overflow-hidden border border-[#2E3643]">
+              <div className="w-full h-1.5 bg-[#0E1116] rounded overflow-hidden border border-[#2E3643]">
                 <div
                   className={`h-full transition-all duration-300 ${
                     submission.riskScore >= 75
@@ -212,33 +276,32 @@ export const ReviewDetailsPage: React.FC = () => {
                 />
               </div>
               <div className="flex justify-between text-[10px] font-mono text-[#687487] mt-1">
-                <span>0 (Compliant)</span>
-                <span>50 (Moderate)</span>
-                <span>100 (Critical Risk)</span>
+                <span>0</span>
+                <span>50</span>
+                <span>100</span>
               </div>
             </div>
 
-            {/* Finding categories count */}
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#2E3643] text-center text-xs">
+            <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#2E3643] text-center text-xs">
               <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[10px] font-mono uppercase text-[#96A0B0] block">Security</span>
-                <span className="font-serif text-sm font-medium text-[#E06C75]">{securityCount} issues</span>
+                <span className="font-serif text-sm font-medium text-[#E06C75]">{securityCount}</span>
               </div>
               <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
-                <span className="text-[10px] font-mono uppercase text-[#96A0B0] block">Performance</span>
-                <span className="font-serif text-sm font-medium text-[#D4AF67]">{performanceCount} issues</span>
+                <span className="text-[10px] font-mono uppercase text-[#96A0B0] block">Perf</span>
+                <span className="font-serif text-sm font-medium text-[#D4AF67]">{performanceCount}</span>
               </div>
               <div className="p-2 rounded bg-[#0E1116] border border-[#2E3643]">
                 <span className="text-[10px] font-mono uppercase text-[#96A0B0] block">Quality</span>
-                <span className="font-serif text-sm font-medium text-[#4EAA78]">{qualityCount} issues</span>
+                <span className="font-serif text-sm font-medium text-[#4EAA78]">{qualityCount}</span>
               </div>
             </div>
           </div>
 
           {/* 3. AI Executive Summary */}
-          <div className="bg-[#161B22] border border-[#2E3643] rounded p-5 shadow-sm space-y-2">
+          <div className="bg-[#161B22] border border-[#2E3643] rounded p-4 shadow-sm space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono text-[#C5A059] font-medium">
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               <span>Qwen2.5-Coder Synthesis</span>
             </div>
             <p className="text-xs text-[#F2F4F8] leading-relaxed font-sans">
@@ -247,18 +310,17 @@ export const ReviewDetailsPage: React.FC = () => {
           </div>
 
           {/* 4. Filterable Issues List */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-serif font-medium text-[#F2F4F8]">
                   Inspection Findings ({submission.issues.length})
                 </h3>
                 <p className="text-xs text-[#96A0B0]">
-                  {criticalIssuesCount} critical vulnerabilities, {warningsCount} warnings
+                  {criticalIssuesCount} critical, {warningsCount} warnings
                 </p>
               </div>
 
-              {/* Severity filter pills */}
               <div className="flex items-center gap-1 text-[11px] font-mono">
                 {['all', 'critical', 'high', 'medium'].map((sev) => (
                   <button
@@ -276,10 +338,9 @@ export const ReviewDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* List of Issue Cards */}
-            <div className="space-y-3 max-h-[620px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[480px] overflow-y-auto pr-0.5">
               {filteredIssues.length === 0 ? (
-                <div className="p-6 text-center text-[#96A0B0] text-xs font-mono bg-[#161B22] border border-[#2E3643] rounded">
+                <div className="p-5 text-center text-[#96A0B0] text-xs font-mono bg-[#161B22] border border-[#2E3643] rounded">
                   No findings match severity tier: {filterSeverity}.
                 </div>
               ) : (
@@ -297,13 +358,13 @@ export const ReviewDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 5. Communication Thread Box */}
+          {/* 5. Communication Thread */}
           <div className="bg-[#161B22] border border-[#2E3643] rounded p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-[#2E3643] pb-2">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-3.5 h-3.5 text-[#C5A059]" />
                 <h4 className="text-xs font-serif font-medium text-[#F2F4F8]">
-                  Review Ledger & Developer Exchange
+                  Review Ledger
                 </h4>
               </div>
               <span className="text-[10px] font-mono text-[#96A0B0]">
@@ -311,10 +372,9 @@ export const ReviewDetailsPage: React.FC = () => {
               </span>
             </div>
 
-            {/* Comment Thread */}
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
               {commentList.map((c, i) => (
-                <div key={i} className="p-2.5 rounded bg-[#0E1116] border border-[#2E3643] text-xs text-[#F2F4F8]">
+                <div key={i} className="p-2 rounded bg-[#0E1116] border border-[#2E3643] text-xs text-[#F2F4F8]">
                   <div className="flex items-center justify-between mb-1 text-[10px] font-mono text-[#96A0B0]">
                     <span className="font-medium text-[#C5A059]">
                       {i === 0 ? 'Qwen2.5-Coder 7B' : 'Sarah Jenkins (Director of Eng)'}
@@ -326,7 +386,6 @@ export const ReviewDetailsPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Add Comment Input */}
             <form onSubmit={handleAddComment} className="flex gap-2">
               <input
                 type="text"
@@ -343,16 +402,6 @@ export const ReviewDetailsPage: React.FC = () => {
               </button>
             </form>
           </div>
-        </div>
-
-        {/* Right Column (7 cols): Full Interactive Code Viewer */}
-        <div className="lg:col-span-7 sticky top-20">
-          <CodeViewer
-            codeFiles={submission.codeFiles}
-            issues={submission.issues}
-            selectedIssueId={selectedIssueId}
-            onApplyFix={(issueId) => applyIssueFix(submission.id, issueId)}
-          />
         </div>
       </div>
 
