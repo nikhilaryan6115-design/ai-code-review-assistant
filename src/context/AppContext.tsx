@@ -58,6 +58,7 @@ interface AppContextType {
   toggleAutoReview: (repoId: string) => void;
   connectNewRepository: (repo: Partial<Repository>) => void;
   refreshFromBackend: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -306,6 +307,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addToast('Repository Connected', `Linked ${newRepo.fullName} with active webhooks.`, 'success');
   };
 
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {}
+    setBackendUser(null);
+    window.location.href = '/login';
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -334,6 +343,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleAutoReview,
         connectNewRepository,
         refreshFromBackend,
+        logout,
       }}
     >
       {children}

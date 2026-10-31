@@ -95,6 +95,7 @@ authRouter.get('/github/callback', async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -234,6 +235,11 @@ authRouter.post('/demo-login', (req, res) => {
  * Logout
  */
 authRouter.post('/logout', (req, res) => {
-  res.clearCookie('revai_session');
+  res.clearCookie('revai_session', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+  });
   res.json({ success: true, message: 'Logged out successfully' });
 });

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { Github, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Github, Lock, Mail, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 import { CrescentMoonSVG } from '../../components/halloween/MoonSVG';
 import { PumpkinSVG } from '../../components/halloween/PumpkinSVG';
 import { RevAILogo } from '../../components/brand/RevAILogo';
@@ -9,13 +9,30 @@ import { RevAILogo } from '../../components/brand/RevAILogo';
 export const LoginPage: React.FC = () => {
   const { setRole, addToast } = useApp();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [oauthError, setOauthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error === 'github_client_id_missing') {
+      setOauthError(
+        'GitHub OAuth credentials are not configured yet on the server. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in your .env file.'
+      );
+    } else if (error) {
+      setOauthError(`GitHub Authentication failed: ${decodeURIComponent(error)}`);
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      setOauthError('Please enter email and password.');
+      return;
+    }
     setRole('manager');
     addToast('Signed In', 'Welcome to RevAI workspace.', 'success');
     navigate('/manager');
@@ -91,6 +108,16 @@ export const LoginPage: React.FC = () => {
 
           {/* Real GitHub OAuth Primary Button */}
           <div className="space-y-2">
+            {oauthError && (
+              <div className="p-3 rounded bg-red-950/40 border border-red-800/40 text-red-200 text-xs flex items-start gap-2.5 font-sans leading-relaxed">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="font-medium block text-red-300">Authentication Alert</span>
+                  <span className="text-[11px] text-red-200/90">{oauthError}</span>
+                </div>
+              </div>
+            )}
+
             <a
               href="/api/auth/github"
               className="w-full flex items-center justify-center gap-2.5 py-3 rounded bg-editorial-brass hover:bg-editorial-brass/90 text-editorial-bg text-xs font-semibold tracking-wide transition-editorial shadow-editorial-card cursor-pointer text-center"

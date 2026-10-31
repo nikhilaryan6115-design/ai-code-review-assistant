@@ -28,7 +28,8 @@ export const Navbar: React.FC = () => {
     markNotificationRead, 
     markAllNotificationsRead,
     globalSearch,
-    setGlobalSearch
+    setGlobalSearch,
+    logout
   } = useApp();
   
   const navigate = useNavigate();
@@ -295,12 +296,9 @@ export const Navbar: React.FC = () => {
 
                 <div className="pt-1 border-t border-ivf-border">
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                       setShowUserMenu(false);
-                      try {
-                        await fetch('/api/auth/logout', { method: 'POST' });
-                      } catch {}
-                      window.location.href = '/login';
+                      logout();
                     }}
                     className="w-full text-left flex items-center gap-2.5 px-3 py-1.5 text-xs text-ivf-red hover:bg-red-50 transition-colors cursor-pointer"
                   >
