@@ -299,10 +299,47 @@
   animation: revaiDotWave 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.36s infinite;
 }
 
+/* Three nodes pulse sequentially on the emblem */
+@keyframes revaiNodePulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.92);
+  }
+  32% {
+    opacity: 1;
+    transform: scale(1.16);
+  }
+  64% {
+    opacity: 0.3;
+    transform: scale(0.92);
+  }
+}
+
+.animate-revai-emblem-dot-1 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: revaiNodePulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0s infinite;
+}
+
+.animate-revai-emblem-dot-2 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: revaiNodePulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.35s infinite;
+}
+
+.animate-revai-emblem-dot-3 {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: revaiNodePulse 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.7s infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-revai-dot-1,
   .animate-revai-dot-2,
-  .animate-revai-dot-3 {
+  .animate-revai-dot-3,
+  .animate-revai-emblem-dot-1,
+  .animate-revai-emblem-dot-2,
+  .animate-revai-emblem-dot-3 {
     animation: none !important;
     opacity: 0.85;
     transform: none !important;

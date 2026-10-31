@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
@@ -80,13 +80,38 @@ const IndexRedirect: React.FC = () => {
 };
 
 export const App: React.FC = () => {
-  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const finishInit = () => {
+      if (mounted) {
+        requestAnimationFrame(() => {
+          setIsInitializing(false);
+        });
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      const timer = setTimeout(finishInit, 200);
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
+    } else {
+      window.addEventListener('load', finishInit);
+      return () => {
+        mounted = false;
+        window.removeEventListener('load', finishInit);
+      };
+    }
+  }, []);
 
   return (
     <AppProvider>
-      {isAppLoading && (
-        <LoadingScreen onComplete={() => setIsAppLoading(false)} />
-      )}
+      <AnimatePresence>
+        {isInitializing && <LoadingScreen />}
+      </AnimatePresence>
       <BrowserRouter>
         <Routes>
           {/* Public Auth */}
