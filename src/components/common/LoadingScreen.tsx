@@ -26,8 +26,18 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
           size={64}
           showBadge={true}
           subtitle="Automated Code Review Platform"
-          className="mb-6"
+          className="mb-4"
         />
+
+        {/* Hairline Progress Meter */}
+        <div className="w-44 h-0.5 bg-ivf-border rounded-full overflow-hidden mb-3">
+          <motion.div
+            className="h-full bg-ivf-accent"
+            initial={{ width: '10%' }}
+            animate={{ width: '100%' }}
+            transition={{ duration: 1.35, ease: 'easeInOut' }}
+          />
+        </div>
 
         {/* Status indicator */}
         <p className="text-xs font-mono text-ivf-sec text-center tracking-tight">

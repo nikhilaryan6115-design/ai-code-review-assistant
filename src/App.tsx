@@ -93,16 +93,19 @@ export const App: React.FC = () => {
     };
 
     if (document.readyState === 'complete') {
-      const timer = setTimeout(finishInit, 200);
+      const timer = setTimeout(finishInit, 1400);
       return () => {
         mounted = false;
         clearTimeout(timer);
       };
     } else {
-      window.addEventListener('load', finishInit);
+      const handleLoad = () => {
+        const timer = setTimeout(finishInit, 1200);
+      };
+      window.addEventListener('load', handleLoad);
       return () => {
         mounted = false;
-        window.removeEventListener('load', finishInit);
+        window.removeEventListener('load', handleLoad);
       };
     }
   }, []);
