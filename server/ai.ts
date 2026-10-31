@@ -76,9 +76,10 @@ export async function analyzeCodeDiff(
   const openAiApiKey = process.env.OPENAI_API_KEY;
 
   // Truncate overly massive diffs to protect token limits (e.g. 50,000 characters)
-  const truncatedDiff = rawDiff.length > 50000 
-    ? rawDiff.substring(0, 50000) + '\n\n[... Diff truncated for review context window ...]' 
-    : rawDiff;
+  const safeDiff = rawDiff || '';
+  const truncatedDiff = safeDiff.length > 50000 
+    ? safeDiff.substring(0, 50000) + '\n\n[... Diff truncated for review context window ...]' 
+    : safeDiff;
 
   const userContent = `PR Title: ${prTitle}
 Primary Repository Language: ${repoLanguage}

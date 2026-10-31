@@ -466,15 +466,23 @@ export function initDatabase() {
     );
   `);
 
-  // Seed default data if empty
-  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
-  if (!userCount || userCount.count === 0) {
+  // Seed default data if empty or outdated
+  const subCount = db.prepare('SELECT COUNT(*) as count FROM submissions').get() as { count: number };
+  if (!subCount || subCount.count < 6) {
     seedInitialData();
   }
 }
 
 function seedInitialData() {
   const now = new Date().toISOString();
+
+  // Clear existing seeded records to ensure fresh portfolio test cases
+  const seededIds = ['sub-142', 'sub-143', 'sub-156', 'sub-204', 'sub-218', 'sub-95'];
+  for (const id of seededIds) {
+    db.prepare('DELETE FROM submissions WHERE id = ?').run(id);
+    db.prepare('DELETE FROM issues WHERE submission_id = ?').run(id);
+    db.prepare('DELETE FROM code_files WHERE submission_id = ?').run(id);
+  }
   
   // Seed Sarah Jenkins (Manager)
   db.prepare(`
@@ -742,6 +750,385 @@ export class AuthService {
 -    await db.query(logQuery);
 +    const logQuery = "INSERT INTO audit_logs (user_id, action) VALUES ($1, $2)";
 +    await db.query(logQuery, [userId, "token_refresh"]);`
+  );
+
+  // Seed Additional Portfolio Showcase Test Cases
+  // 1. PR #156: AI Prompt Injection & Cloud SSRF in RAG Pipeline (Python)
+  subStmt.run(
+    'sub-156',
+    'repo-user-api',
+    156,
+    'feat(ai): Implement multi-modal RAG prompt assembly with user context injection',
+    'usr-marcus',
+    'Marcus Chen',
+    'marcus.chen@acme-corp.internal',
+    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    'Senior ML Engineer',
+    'feat/rag-prompt-assembly',
+    'main',
+    '8f2c1b4',
+    'changes_requested',
+    'critical',
+    91,
+    'Qwen2.5-Coder 7B',
+    'Surfaced 2 critical security vulnerabilities: CWE-1336 Prompt Injection vector bypassing delimiter boundaries and CWE-918 Server-Side Request Forgery in remote document fetcher.',
+    'Direct string concatenation in prompt builder allows untrusted user tokens to break instruction boundaries and hijack model response. Additionally, document fetcher accepts arbitrary URL schemes including internal cloud metadata IP 169.254.169.254.',
+    4,
+    215,
+    48,
+    'https://github.com/acme-org/user-api/pull/156',
+    'changes_requested',
+    now,
+    'Sarah Jenkins',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    'Block merge immediately. Enforce delimiter tagging for RAG context and apply URL scheme allowlist to prevent cloud metadata SSRF.',
+    3,
+    18,
+    now,
+    now
+  );
+
+  issueStmt.run(
+    'iss-03',
+    'sub-156',
+    'CWE-1336: Direct Prompt Injection in System Context Delimiter',
+    'critical',
+    'security',
+    'services/rag_service.py',
+    54,
+    59,
+    'Unescaped interpolation of raw user input inside top-level LLM instruction block allows prompt jailbreaking.',
+    'Malicious payloads containing system override tags can bypass safety moderation, exfiltrate private training schemas, and trigger unauthorized tool invocations.',
+    'Separate system directives from dynamic user context using message role separation or structured XML boundary tags.',
+    'prompt = f"System: Analyze user data.\\nContext: {user_input}\\nAnswer:"\nreturn llm.invoke(prompt)',
+    'prompt = ChatPromptTemplate.from_messages([\n    ("system", "Analyze user data within isolated context boundary."),\n    ("human", "{user_input}")\n])\nreturn llm.invoke(prompt.format_messages(user_input=user_input))',
+    'CWE-1336: Improper Neutralization in Prompt Template',
+    'open'
+  );
+
+  issueStmt.run(
+    'iss-04',
+    'sub-156',
+    'CWE-918: Server-Side Request Forgery (SSRF) in Remote Doc Loader',
+    'high',
+    'security',
+    'services/rag_service.py',
+    112,
+    118,
+    'Remote document retriever invokes `requests.get(source_url)` without validating private subnet or loopback addresses.',
+    'Attackers can target internal AWS metadata service (169.254.169.254) to exfiltrate IAM role credentials or probe internal VPC infrastructure.',
+    'Enforce strict allowlists: validate URL scheme (https only), resolve host IP before request, and reject RFC 1918 private subnets.',
+    'def fetch_context_doc(source_url: str):\n    resp = requests.get(source_url, timeout=5)\n    return resp.text',
+    'def fetch_context_doc(source_url: str):\n    parsed = validate_safe_public_url(source_url)\n    resp = requests.get(parsed, timeout=5, allow_redirects=False)\n    return resp.text',
+    'CWE-918: Server-Side Request Forgery',
+    'open'
+  );
+
+  db.prepare(`
+    INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    'cf-02',
+    'sub-156',
+    'services/rag_service.py',
+    'python',
+    `import requests
+from langchain.prompts import PromptTemplate
+
+class RAGPipeline:
+    def build_prompt(self, user_input: str) -> str:
+        # Vulnerable string interpolation in prompt assembly
+        prompt = f"System: Analyze user data.\\nContext: {user_input}\\nAnswer:"
+        return prompt
+
+    def fetch_context_doc(self, source_url: str) -> str:
+        # Unvalidated HTTP GET allowing SSRF
+        resp = requests.get(source_url, timeout=5)
+        return resp.text`,
+    `import requests
+from urllib.parse import urlparse
+from langchain_core.prompts import ChatPromptTemplate
+
+class RAGPipeline:
+    def build_prompt(self, user_input: str):
+        # Secure message role boundary isolation
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", "Analyze user data within isolated context boundary."),
+            ("human", "{user_input}")
+        ])
+        return prompt.format_messages(user_input=user_input)
+
+    def fetch_context_doc(self, source_url: str) -> str:
+        # Enforce HTTPS-only and block private cloud subnets
+        parsed = urlparse(source_url)
+        if parsed.scheme != "https" or parsed.hostname in ["169.254.169.254", "localhost", "127.0.0.1"]:
+            raise ValueError("Insecure document URL requested")
+        resp = requests.get(source_url, timeout=5, allow_redirects=False)
+        return resp.text`,
+    `@@ -6,3 +6,6 @@
+-        prompt = f"System: Analyze user data.\\nContext: {user_input}\\nAnswer:"
+-        return prompt
++        prompt = ChatPromptTemplate.from_messages([
++            ("system", "Analyze user data within isolated context boundary."),
++            ("human", "{user_input}")
++        ])
++        return prompt.format_messages(user_input=user_input)`
+  );
+
+  // 2. PR #204: Concurrency & Unbounded Goroutine Leak in SSE Streamer (Go)
+  subStmt.run(
+    'sub-204',
+    'repo-payment-gateway',
+    204,
+    'perf(stream): High-throughput SSE telemetry worker with buffer pooling',
+    'usr-priya',
+    'Priya Nair',
+    'priya.nair@acme-corp.internal',
+    'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&auto=format&fit=crop&q=80',
+    'Infrastructure Engineer',
+    'perf/sse-telemetry-pool',
+    'main',
+    '3a1d9e2',
+    'changes_requested',
+    'high',
+    72,
+    'Qwen2.5-Coder 7B',
+    'Surfaced 1 high-severity concurrency vulnerability: CWE-400 Unbounded goroutine creation leading to memory exhaustion on client disconnect.',
+    'Each streaming connection creates an event pump that does not monitor http.Request.Context().Done(). Client drops leave orphaned goroutines running indefinitely.',
+    2,
+    94,
+    18,
+    'https://github.com/acme-org/payment-gateway/pull/204',
+    'changes_requested',
+    now,
+    'Sarah Jenkins',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    'Ensure select statement includes case <-ctx.Done() to terminate worker thread when client aborts TCP connection.',
+    1,
+    9,
+    now,
+    now
+  );
+
+  issueStmt.run(
+    'iss-05',
+    'sub-204',
+    'CWE-400: Unbounded Goroutine Leak under Client Disconnection',
+    'high',
+    'bug',
+    'pkg/telemetry/streamer.go',
+    82,
+    91,
+    'Event pump loop does not listen to request context cancellation, causing persistent worker leaks upon socket close.',
+    'High traffic bursts with dropped connections will cause memory usage to grow monotonically, triggering container OOM kills in Kubernetes.',
+    'Add context cancellation handler to the event dispatch channel select block.',
+    'for event := range eventChan {\n    w.Write(event.Bytes())\n    flusher.Flush()\n}',
+    'for {\n    select {\n    case <-r.Context().Done():\n        return\n    case event, ok := <-eventChan:\n        if !ok { return }\n        w.Write(event.Bytes())\n        flusher.Flush()\n    }\n}',
+    'CWE-400: Uncontrolled Resource Consumption',
+    'open'
+  );
+
+  db.prepare(`
+    INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    'cf-03',
+    'sub-204',
+    'pkg/telemetry/streamer.go',
+    'go',
+    `package telemetry
+
+import "net/http"
+
+func StreamEvents(w http.ResponseWriter, r *http.Request, eventChan <-chan []byte) {
+    flusher, _ := w.(http.Flusher)
+    // Orphaned goroutine loop: ignores client disconnect
+    for event := range eventChan {
+        w.Write(event)
+        flusher.Flush()
+    }
+}`,
+    `package telemetry
+
+import "net/http"
+
+func StreamEvents(w http.ResponseWriter, r *http.Request, eventChan <-chan []byte) {
+    flusher, _ := w.(http.Flusher)
+    ctx := r.Context()
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case event, ok := <-eventChan:
+            if !ok {
+                return
+            }
+            w.Write(event)
+            flusher.Flush()
+        }
+    }
+}`,
+    `@@ -7,4 +7,10 @@
+-    for event := range eventChan {
+-        w.Write(event)
+-        flusher.Flush()
+-    }
++    for {
++        select {
++        case <-r.Context().Done():
++            return
++        case event, ok := <-eventChan:
++            if !ok { return }
++            w.Write(event)
++            flusher.Flush()
++        }
++    }`
+  );
+
+  // 3. PR #218: Enterprise WebAuthn MFA - Clean Approved (TypeScript)
+  subStmt.run(
+    'sub-218',
+    'repo-auth-service',
+    218,
+    'feat(security): Implement hardware MFA WebAuthn/FIDO2 challenge verification',
+    'usr-alex',
+    'Alex Rivera',
+    'alex.rivera@acme-corp.internal',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    'Principal Security Architect',
+    'feat/webauthn-mfa',
+    'main',
+    '6c2b4f9',
+    'approved',
+    'safe',
+    8,
+    'Qwen2.5-Coder 7B',
+    'High-assurance cryptographic authentication module complying with FIDO2 Level 3 specifications. Zero vulnerabilities detected.',
+    'Verified high-entropy challenge generation, anti-replay nonces, constant-time signature verification, and 100% test coverage.',
+    5,
+    312,
+    24,
+    'https://github.com/acme-org/auth-service/pull/218',
+    'approved',
+    now,
+    'Sarah Jenkins',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    'Comprehensive test suite and clean adherence to RFC 8812 and WebAuthn specifications. Approved for production merge.',
+    2,
+    16,
+    now,
+    now
+  );
+
+  db.prepare(`
+    INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    'cf-04',
+    'sub-218',
+    'src/services/webauthn.service.ts',
+    'typescript',
+    `import crypto from 'crypto';
+
+export class WebAuthnService {
+  verifyChallenge(storedChallenge: string, receivedChallenge: string): boolean {
+    const a = Buffer.from(storedChallenge);
+    const b = Buffer.from(receivedChallenge);
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  }
+}`,
+    `import crypto from 'crypto';
+
+export class WebAuthnService {
+  verifyChallenge(storedChallenge: string, receivedChallenge: string): boolean {
+    const a = Buffer.from(storedChallenge);
+    const b = Buffer.from(receivedChallenge);
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(a, b);
+  }
+}`,
+    `@@ -1,8 +1,8 @@
++// Verified FIDO2 challenge verification with constant-time cryptographic check
++export class WebAuthnService { ... }`
+  );
+
+  // 4. PR #95: Horizontal Privilege Escalation IDOR Patch (Python)
+  subStmt.run(
+    'sub-95',
+    'repo-user-api',
+    95,
+    'fix(tenant): Enforce organization scoping on workspace member queries',
+    'usr-david',
+    'David Zhao',
+    'david.zhao@acme-corp.internal',
+    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+    'Staff Security Engineer',
+    'fix/tenant-boundary-idor',
+    'main',
+    '1e9d4c7',
+    'approved',
+    'safe',
+    24,
+    'Qwen2.5-Coder 7B',
+    'Remediates critical horizontal privilege escalation (IDOR) in workspace user management. Verified tenancy guard assertions.',
+    'The pull request wraps workspace member retrieval in an organization tenancy boundary check, preventing cross-tenant data exfiltration.',
+    2,
+    42,
+    14,
+    'https://github.com/acme-org/user-api/pull/95',
+    'approved',
+    now,
+    'Sarah Jenkins',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    'Verified with multi-tenant integration test matrix. Excellent security hardening.',
+    1,
+    8,
+    now,
+    now
+  );
+
+  issueStmt.run(
+    'iss-06',
+    'sub-95',
+    'CWE-639: Insecure Direct Object References in Workspace Membership Query',
+    'medium',
+    'security',
+    'api/resolvers/workspace.py',
+    31,
+    37,
+    'Resolver queries workspace members by raw ID parameter without verifying tenant relationship of caller.',
+    'Authenticated users from Organization A can inspect membership rosters of Organization B by guessing or iterating workspace IDs.',
+    'Add tenancy scoping filter `organization_id == caller.org_id` to database query.',
+    'members = db.query(Member).filter(Member.workspace_id == workspace_id).all()',
+    'members = db.query(Member).filter(\n    Member.workspace_id == workspace_id,\n    Member.organization_id == caller.current_org_id\n).all()',
+    'CWE-639: Authorization Bypass Through User-Controlled Key',
+    'resolved'
+  );
+
+  db.prepare(`
+    INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    'cf-05',
+    'sub-95',
+    'api/resolvers/workspace.py',
+    'python',
+    `def get_workspace_members(workspace_id: str, caller: UserContext):
+    # Missing tenant isolation filter
+    return db.query(Member).filter(Member.workspace_id == workspace_id).all()`,
+    `def get_workspace_members(workspace_id: str, caller: UserContext):
+    # Enforce tenant isolation boundary
+    return db.query(Member).filter(
+        Member.workspace_id == workspace_id,
+        Member.organization_id == caller.current_org_id
+    ).all()`,
+    `@@ -2,2 +2,4 @@
+-    return db.query(Member).filter(Member.workspace_id == workspace_id).all()
++    return db.query(Member).filter(
++        Member.workspace_id == workspace_id,
++        Member.organization_id == caller.current_org_id
++    ).all()`
   );
 
   // Seed Notifications
