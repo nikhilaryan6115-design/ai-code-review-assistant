@@ -412,7 +412,20 @@ function initDatabase() {
 }
 function seedInitialData() {
   const now = (/* @__PURE__ */ new Date()).toISOString();
-  const seededIds = ["sub-142", "sub-143", "sub-156", "sub-204", "sub-218", "sub-95"];
+  const seededIds = [
+    "sub-142",
+    "sub-143",
+    "sub-156",
+    "sub-204",
+    "sub-218",
+    "sub-95",
+    "sub-301",
+    "sub-302",
+    "sub-303",
+    "sub-304",
+    "sub-305",
+    "sub-306"
+  ];
   for (const id of seededIds) {
     db.prepare("DELETE FROM submissions WHERE id = ?").run(id);
     db.prepare("DELETE FROM issues WHERE submission_id = ?").run(id);
@@ -1029,6 +1042,637 @@ export class WebAuthnService {
 +        Member.organization_id == caller.current_org_id
 +    ).all()`
   );
+  subStmt.run(
+    "sub-301",
+    "repo-auth-service",
+    301,
+    "chore(ci): Migrate secrets loader to AWS Secrets Manager SDK",
+    "usr-rahul",
+    "Rahul Sharma",
+    "rahul.sharma@acme-corp.internal",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    "Backend Engineer",
+    "chore/secrets-manager-migration",
+    "main",
+    "a2f91bd",
+    "ai_completed",
+    "critical",
+    95,
+    "Qwen2.5-Coder 7B",
+    "CRITICAL: Hardcoded AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY literals detected in src/config/secrets.ts (CWE-798). Immediate block required \u2014 credentials committed to source control.",
+    "The migration scaffolding contains development AWS credentials left in plain text. Even if rotated, this practice creates a persistent audit trail in git history. Additionally, missing IAM role validation allows privilege escalation via AssumeRole chaining.",
+    2,
+    67,
+    14,
+    "https://github.com/acme-org/auth-service/pull/301",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    7,
+    now,
+    now
+  );
+  issueStmt.run(
+    "iss-301-1",
+    "sub-301",
+    "CWE-798: Hardcoded AWS Credentials in Source Code",
+    "critical",
+    "security",
+    "src/config/secrets.ts",
+    12,
+    15,
+    "AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are hardcoded as string literals and committed to version control.",
+    "Any person with read access to the repository \u2014 including CI systems, third-party integrations, and all historical git clones \u2014 has permanent access to these credentials. This is a complete compromise of the AWS account.",
+    "Use environment variables only. Rotate these credentials immediately via AWS IAM console. Add .env to .gitignore and use AWS SDK default credential chain.",
+    `const awsConfig = {
+  accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+  secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+  region: "us-east-1"
+};`,
+    `const awsConfig = {
+  // Credentials resolved from environment or IAM instance profile
+  region: process.env.AWS_REGION || "us-east-1"
+};
+// Use: new SecretsManagerClient({ region: awsConfig.region })`,
+    "CWE-798: Use of Hard-coded Credentials",
+    "open"
+  );
+  issueStmt.run(
+    "iss-301-2",
+    "sub-301",
+    "CWE-269: Overly Permissive IAM AssumeRole \u2014 No Condition Block",
+    "high",
+    "security",
+    "src/config/secrets.ts",
+    28,
+    34,
+    "AssumeRole call omits Condition constraints allowing role chaining from any principal.",
+    "Without ExternalId or aws:PrincipalOrgID conditions, any authenticated AWS principal can chain into this role, enabling cross-account privilege escalation.",
+    "Add Condition block with aws:PrincipalOrgID and ExternalId to restrict AssumeRole to your organization only.",
+    `await sts.assumeRole({
+  RoleArn: roleArn,
+  RoleSessionName: "app-session"
+}).promise();`,
+    `await sts.assumeRole({
+  RoleArn: roleArn,
+  RoleSessionName: "app-session",
+  ExternalId: process.env.STS_EXTERNAL_ID,
+}).promise();`,
+    "CWE-269: Improper Privilege Management",
+    "open"
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-301",
+    "sub-301",
+    "src/config/secrets.ts",
+    "typescript",
+    `import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
+
+// TODO: replace before merge \u2014 dev credentials
+const awsConfig = {
+  accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+  secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+  region: "us-east-1"
+};
+
+const client = new SecretsManagerClient(awsConfig);
+
+export async function getSecret(name: string): Promise<string> {
+  const cmd = new GetSecretValueCommand({ SecretId: name });
+  const res = await client.send(cmd);
+  return res.SecretString ?? '';
+}
+
+export async function assumeDeployRole(roleArn: string) {
+  const sts = new STSClient(awsConfig);
+  return sts.send(new AssumeRoleCommand({
+    RoleArn: roleArn,
+    RoleSessionName: "app-session"
+  }));
+}`,
+    `import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
+
+// Credentials resolved via IAM instance profile / env vars
+const client = new SecretsManagerClient({ region: process.env.AWS_REGION || "us-east-1" });
+
+export async function getSecret(name: string): Promise<string> {
+  const cmd = new GetSecretValueCommand({ SecretId: name });
+  const res = await client.send(cmd);
+  return res.SecretString ?? '';
+}
+
+export async function assumeDeployRole(roleArn: string) {
+  const sts = new STSClient({ region: process.env.AWS_REGION || "us-east-1" });
+  return sts.send(new AssumeRoleCommand({
+    RoleArn: roleArn,
+    RoleSessionName: "app-session",
+    ExternalId: process.env.STS_EXTERNAL_ID,
+  }));
+}`,
+    `@@ -4,6 +4,3 @@
+-const awsConfig = {
+-  accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+-  secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+-  region: "us-east-1"
+-};
++// Credentials resolved via IAM instance profile
+ const client = new SecretsManagerClient({ region: process.env.AWS_REGION });`
+  );
+  subStmt.run(
+    "sub-302",
+    "repo-user-api",
+    302,
+    "feat(db): Add composite index on user_events table for analytics queries",
+    "usr-elena",
+    "Elena Rostova",
+    "elena.r@acme-corp.internal",
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    "Staff Security Engineer",
+    "feat/user-events-index",
+    "main",
+    "c7e30ff",
+    "ai_completed",
+    "safe",
+    12,
+    "Qwen2.5-Coder 7B",
+    "Clean migration. Composite index uses CONCURRENTLY to avoid table lock. Rollback procedure present. Zero security, injection, or logic vulnerabilities detected.",
+    "Standard Alembic migration adding a composite (user_id, created_at, event_type) index. CONCURRENTLY flag prevents blocking production queries. Down migration correctly drops the index. No raw SQL interpolation present.",
+    1,
+    38,
+    4,
+    "https://github.com/acme-org/user-api/pull/302",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    6,
+    now,
+    now
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-302",
+    "sub-302",
+    "migrations/0042_user_events_index.py",
+    "python",
+    `"""Add composite index on user_events for analytics performance."""
+from alembic import op
+
+def upgrade() -> None:
+    op.execute("""
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS
+        idx_user_events_user_created_type
+        ON user_events (user_id, created_at DESC, event_type)
+    """)
+
+def downgrade() -> None:
+    op.execute("DROP INDEX CONCURRENTLY IF EXISTS idx_user_events_user_created_type")`,
+    null,
+    `@@ -0,0 +1,13 @@
++"""Add composite index on user_events for analytics performance."""
++from alembic import op
++
++def upgrade() -> None:
++    op.execute("""
++        CREATE INDEX CONCURRENTLY IF NOT EXISTS
++        idx_user_events_user_created_type
++        ON user_events (user_id, created_at DESC, event_type)
++    """)
++
++def downgrade() -> None:
++    op.execute("DROP INDEX CONCURRENTLY IF EXISTS idx_user_events_user_created_type")`
+  );
+  subStmt.run(
+    "sub-303",
+    "repo-payment-gateway",
+    303,
+    "feat(webhooks): Add Slack event subscription handler for payment alerts",
+    "usr-marcus",
+    "Marcus Chen",
+    "marcus.chen@acme-corp.internal",
+    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    "Senior ML Engineer",
+    "feat/slack-webhook-handler",
+    "main",
+    "b8c12de",
+    "ai_completed",
+    "high",
+    74,
+    "Qwen2.5-Coder 7B",
+    "High-severity finding: CWE-502 Insecure Deserialization via yaml.load() without SafeLoader. Attacker-controlled Slack payload body can execute arbitrary Python code on the server.",
+    "The webhook handler deserializes the incoming event body using yaml.load() which permits arbitrary Python object instantiation. A crafted payload can trigger RCE via !!python/object/apply tags.",
+    2,
+    112,
+    9,
+    "https://github.com/acme-org/payment-gateway/pull/303",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    11,
+    now,
+    now
+  );
+  issueStmt.run(
+    "iss-303-1",
+    "sub-303",
+    "CWE-502: Insecure Deserialization via yaml.load() \u2014 RCE Vector",
+    "critical",
+    "security",
+    "handlers/slack_webhook.py",
+    31,
+    34,
+    "yaml.load() without Loader=yaml.SafeLoader executes arbitrary Python constructors embedded in the YAML payload.",
+    "An attacker who can send HTTP requests to this endpoint can achieve remote code execution by embedding !!python/object/apply:os.system or similar YAML object tags.",
+    "Replace yaml.load(body) with yaml.safe_load(body) which only allows basic YAML scalars and collections.",
+    `event = yaml.load(request.body, Loader=yaml.FullLoader)
+alert_type = event.get("type")`,
+    `event = yaml.safe_load(request.body)
+alert_type = event.get("type") if isinstance(event, dict) else None`,
+    "CWE-502: Deserialization of Untrusted Data",
+    "open"
+  );
+  issueStmt.run(
+    "iss-303-2",
+    "sub-303",
+    "Missing HMAC Signature Verification on Webhook Endpoint",
+    "high",
+    "security",
+    "handlers/slack_webhook.py",
+    18,
+    22,
+    "Slack webhook endpoint does not verify the X-Slack-Signature header before processing the payload.",
+    "Without signature validation any party that discovers the endpoint URL can inject fake payment alert events, leading to fraudulent notifications or logic abuse.",
+    "Validate X-Slack-Signature using HMAC-SHA256 with your Slack signing secret before parsing the body.",
+    `@app.route("/webhook/slack", methods=["POST"])
+def slack_handler():
+    body = request.get_data(as_text=True)
+    event = yaml.load(body)`,
+    `@app.route("/webhook/slack", methods=["POST"])
+def slack_handler():
+    body = request.get_data(as_text=True)
+    _verify_slack_signature(request.headers, body)
+    event = yaml.safe_load(body)`,
+    "CWE-345: Insufficient Verification of Data Authenticity",
+    "open"
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-303",
+    "sub-303",
+    "handlers/slack_webhook.py",
+    "python",
+    `import yaml
+import hmac, hashlib
+from flask import Flask, request
+
+app = Flask(__name__)
+SLACK_SECRET = "xoxb-placeholder"
+
+@app.route("/webhook/slack", methods=["POST"])
+def slack_handler():
+    body = request.get_data(as_text=True)
+    # Missing: signature verification
+    # Vulnerable: insecure deserialization
+    event = yaml.load(body, Loader=yaml.FullLoader)
+    alert_type = event.get("type")
+    process_alert(alert_type, event)
+    return "", 200
+
+def process_alert(kind, payload):
+    print(f"Alert: {kind}", payload)`,
+    `import yaml
+import hmac, hashlib
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+
+def _verify_slack_signature(headers, body):
+    ts = headers.get("X-Slack-Request-Timestamp", "")
+    sig = headers.get("X-Slack-Signature", "")
+    base = f"v0:{ts}:{body}"
+    expected = "v0=" + hmac.new(SLACK_SECRET.encode(), base.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, sig):
+        abort(403)
+
+@app.route("/webhook/slack", methods=["POST"])
+def slack_handler():
+    body = request.get_data(as_text=True)
+    _verify_slack_signature(request.headers, body)
+    event = yaml.safe_load(body)
+    alert_type = event.get("type") if isinstance(event, dict) else None
+    process_alert(alert_type, event)
+    return "", 200`,
+    `@@ -10,4 +10,5 @@
++    _verify_slack_signature(request.headers, body)
+-    event = yaml.load(body, Loader=yaml.FullLoader)
++    event = yaml.safe_load(body)
+-    alert_type = event.get("type")
++    alert_type = event.get("type") if isinstance(event, dict) else None`
+  );
+  subStmt.run(
+    "sub-304",
+    "repo-user-api",
+    304,
+    "fix(ui): Improve ARIA labels and keyboard navigation in dashboard components",
+    "usr-priya",
+    "Priya Nair",
+    "priya.nair@acme-corp.internal",
+    "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&auto=format&fit=crop&q=80",
+    "Infrastructure Engineer",
+    "fix/aria-accessibility",
+    "main",
+    "d9f44ab",
+    "ai_completed",
+    "safe",
+    8,
+    "Qwen2.5-Coder 7B",
+    "Zero security findings. Clean accessibility fix \u2014 adds missing aria-label, role attributes and keyboard event handlers to interactive dashboard components. WCAG 2.1 AA compliant.",
+    "Adds aria-label to all unlabelled icon buttons, fixes tab-index ordering, and adds onKeyDown handlers for Enter/Space to match onClick. No state mutations, no external calls, no injection vectors.",
+    3,
+    52,
+    11,
+    "https://github.com/acme-org/user-api/pull/304",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    5,
+    now,
+    now
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-304",
+    "sub-304",
+    "components/DashboardNav.tsx",
+    "typescript",
+    `import React from 'react';
+import { Bell, Settings, LogOut } from 'lucide-react';
+
+export const DashboardNav: React.FC = () => (
+  <nav className="flex items-center gap-2">
+    <button onClick={() => openNotifications()}>
+      <Bell className="w-5 h-5" />
+    </button>
+    <button onClick={() => openSettings()}>
+      <Settings className="w-5 h-5" />
+    </button>
+    <button onClick={() => logout()}>
+      <LogOut className="w-5 h-5" />
+    </button>
+  </nav>
+);`,
+    `import React from 'react';
+import { Bell, Settings, LogOut } from 'lucide-react';
+
+const handleKey = (fn: () => void) => (e: React.KeyboardEvent) => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
+};
+
+export const DashboardNav: React.FC = () => (
+  <nav role="navigation" aria-label="User actions" className="flex items-center gap-2">
+    <button aria-label="Open notifications" onClick={openNotifications} onKeyDown={handleKey(openNotifications)}>
+      <Bell className="w-5 h-5" aria-hidden="true" />
+    </button>
+    <button aria-label="Open settings" onClick={openSettings} onKeyDown={handleKey(openSettings)}>
+      <Settings className="w-5 h-5" aria-hidden="true" />
+    </button>
+    <button aria-label="Sign out" onClick={logout} onKeyDown={handleKey(logout)}>
+      <LogOut className="w-5 h-5" aria-hidden="true" />
+    </button>
+  </nav>
+);`,
+    `@@ -5,9 +5,11 @@
++const handleKey = (fn: () => void) => (e: React.KeyboardEvent) => {
++  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
++};
+-  <nav className="flex items-center gap-2">
++  <nav role="navigation" aria-label="User actions" className="flex items-center gap-2">
+-    <button onClick={() => openNotifications()}>
++    <button aria-label="Open notifications" onClick={openNotifications} onKeyDown={handleKey(openNotifications)}>
+-      <Bell className="w-5 h-5" />
++      <Bell className="w-5 h-5" aria-hidden="true" />`
+  );
+  subStmt.run(
+    "sub-305",
+    "repo-auth-service",
+    305,
+    "feat(api): Add public JWKS endpoint for service-to-service token validation",
+    "usr-alex",
+    "Alex Rivera",
+    "alex.rivera@acme-corp.internal",
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    "Principal Security Architect",
+    "feat/jwks-public-endpoint",
+    "main",
+    "f3c80ea",
+    "ai_completed",
+    "critical",
+    89,
+    "Qwen2.5-Coder 7B",
+    "CRITICAL \u2014 CWE-327 Algorithm Confusion Attack: JWT verification accepts RS256 and HS256 interchangeably. An attacker can forge tokens signed with the public key using HMAC-SHA256, bypassing all auth checks.",
+    "The token validator does not pin the expected algorithm. By passing the public RSA key as the HMAC secret with alg:HS256, any attacker can self-sign arbitrary JWT payloads. This completely breaks the authentication boundary for all service-to-service calls.",
+    2,
+    89,
+    22,
+    "https://github.com/acme-org/auth-service/pull/305",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    8,
+    now,
+    now
+  );
+  issueStmt.run(
+    "iss-305-1",
+    "sub-305",
+    "CWE-327: JWT Algorithm Confusion \u2014 RS256/HS256 Downgrade Attack",
+    "critical",
+    "security",
+    "src/middleware/jwtVerify.ts",
+    18,
+    24,
+    "jwt.verify() called without algorithms option allows attacker to switch alg header from RS256 to HS256 and sign tokens with the public key.",
+    "An unauthenticated attacker can obtain the public key from the new JWKS endpoint, forge a JWT with alg:HS256 signed using that public key as the HMAC secret, and gain full admin access to any service trusting this validator.",
+    'Pin the allowed algorithm: jwt.verify(token, publicKey, { algorithms: ["RS256"] }). Never accept both symmetric and asymmetric algorithms on the same key.',
+    `const decoded = jwt.verify(token, publicKey);
+return decoded as JWTPayload;`,
+    `const decoded = jwt.verify(token, publicKey, {
+  algorithms: ["RS256"],
+  issuer: process.env.JWT_ISSUER,
+});
+return decoded as JWTPayload;`,
+    "CWE-327: Use of a Broken or Risky Cryptographic Algorithm",
+    "open"
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-305",
+    "sub-305",
+    "src/middleware/jwtVerify.ts",
+    "typescript",
+    `import jwt from 'jsonwebtoken';
+import { readFileSync } from 'fs';
+
+const publicKey = readFileSync('./keys/public.pem', 'utf8');
+
+export interface JWTPayload {
+  sub: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
+export function verifyServiceToken(token: string): JWTPayload {
+  // BUG: no algorithms pin \u2014 vulnerable to HS256 confusion attack
+  const decoded = jwt.verify(token, publicKey);
+  return decoded as JWTPayload;
+}
+
+export function getJWKS() {
+  return {
+    keys: [{ kty: 'RSA', use: 'sig', alg: 'RS256', n: '...', e: 'AQAB' }]
+  };
+}`,
+    `import jwt from 'jsonwebtoken';
+import { readFileSync } from 'fs';
+
+const publicKey = readFileSync('./keys/public.pem', 'utf8');
+
+export interface JWTPayload {
+  sub: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
+
+export function verifyServiceToken(token: string): JWTPayload {
+  const decoded = jwt.verify(token, publicKey, {
+    algorithms: ["RS256"],
+    issuer: process.env.JWT_ISSUER,
+  });
+  return decoded as JWTPayload;
+}
+
+export function getJWKS() {
+  return {
+    keys: [{ kty: 'RSA', use: 'sig', alg: 'RS256', n: '...', e: 'AQAB' }]
+  };
+}`,
+    `@@ -14,3 +14,6 @@
+-  const decoded = jwt.verify(token, publicKey);
++  const decoded = jwt.verify(token, publicKey, {
++    algorithms: ["RS256"],
++    issuer: process.env.JWT_ISSUER,
++  });
+   return decoded as JWTPayload;`
+  );
+  subStmt.run(
+    "sub-306",
+    "repo-auth-service",
+    306,
+    "feat(api): Add per-route rate limiting with Redis sliding window counters",
+    "usr-elena",
+    "Elena Rostova",
+    "elena.r@acme-corp.internal",
+    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    "Staff Security Engineer",
+    "feat/rate-limiting",
+    "main",
+    "e19ff3a",
+    "approved",
+    "safe",
+    15,
+    "Qwen2.5-Coder 7B",
+    "Excellent security implementation. Redis sliding window rate limiter uses atomic Lua scripting \u2014 zero race conditions. Proper 429 response with Retry-After header. All OWASP API Security Top 10 assertions passed.",
+    "Implements per-IP and per-user rate limiting using Redis ZADD/ZREMRANGEBYSCORE with atomic Lua scripting to prevent counter race conditions. Correct use of Retry-After header. No injection vectors, no secret leakage.",
+    2,
+    98,
+    12,
+    "https://github.com/acme-org/auth-service/pull/306",
+    "approved",
+    now,
+    "Sarah Jenkins",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "Textbook implementation. Atomic Lua script and sliding window are exactly right. Approved for merge.",
+    1,
+    9,
+    now,
+    now
+  );
+  db.prepare(`INSERT INTO code_files (id, submission_id, filename, language, content, suggested_content, patch) VALUES (?, ?, ?, ?, ?, ?, ?)`).run(
+    "cf-306",
+    "sub-306",
+    "src/middleware/rateLimiter.ts",
+    "typescript",
+    `import { Redis } from 'ioredis';
+import { Request, Response, NextFunction } from 'express';
+
+const redis = new Redis(process.env.REDIS_URL!);
+
+const RATE_LIMIT_SCRIPT = \`
+  local key = KEYS[1]
+  local now = tonumber(ARGV[1])
+  local window = tonumber(ARGV[2])
+  local limit = tonumber(ARGV[3])
+  redis.call('ZREMRANGEBYSCORE', key, 0, now - window)
+  local count = redis.call('ZCARD', key)
+  if count < limit then
+    redis.call('ZADD', key, now, now)
+    redis.call('EXPIRE', key, math.ceil(window / 1000))
+    return 0
+  end
+  return 1
+\`;
+
+export function rateLimiter(limit = 60, windowMs = 60000) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const key = \`rl:\${req.ip}:\${req.path}\`;
+    const now = Date.now();
+    const blocked = await redis.eval(RATE_LIMIT_SCRIPT, 1, key, now, windowMs, limit);
+    if (blocked) {
+      res.setHeader('Retry-After', Math.ceil(windowMs / 1000));
+      return res.status(429).json({ error: 'Rate limit exceeded. Please retry after indicated interval.' });
+    }
+    next();
+  };
+}`,
+    null,
+    `@@ -0,0 +1,34 @@
++import { Redis } from 'ioredis';
++import { Request, Response, NextFunction } from 'express';
++
++const redis = new Redis(process.env.REDIS_URL!);
++
++const RATE_LIMIT_SCRIPT = \`
++  local key = KEYS[1]
++  local now = tonumber(ARGV[1])
++  ...atomic sliding window logic...
++\`;
++
++export function rateLimiter(limit = 60, windowMs = 60000) {
++  return async (req: Request, res: Response, next: NextFunction) => {
++    const key = \`rl:\${req.ip}:\${req.path}\`;
++    const blocked = await redis.eval(RATE_LIMIT_SCRIPT, ...);
++    if (blocked) {
++      res.setHeader('Retry-After', Math.ceil(windowMs / 1000));
++      return res.status(429).json({ error: 'Rate limit exceeded.' });
++    }
++    next();
++  };
++}`
+  );
   const notifStmt = db.prepare(`
     INSERT INTO notifications (id, user_id, submission_id, title, message, type, timestamp, read, link, pr_number)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -1056,6 +1700,66 @@ export class WebAuthnService {
     1,
     "/manager/reviews/sub-143",
     89
+  );
+  notifStmt.run(
+    "notif-3",
+    "usr-sarah",
+    "sub-301",
+    "CRITICAL: Hardcoded AWS Credentials Detected",
+    "Qwen2.5-Coder detected CWE-798 hardcoded AWS credentials committed to source in PR #301 (auth-service). Immediate review required.",
+    "critical",
+    "5m ago",
+    0,
+    "/manager/reviews/sub-301",
+    301
+  );
+  notifStmt.run(
+    "notif-4",
+    "usr-sarah",
+    "sub-303",
+    "High Risk: Insecure Deserialization in Webhook Handler",
+    "PR #303 (payment-gateway) \u2014 yaml.load() RCE vector detected. Awaiting manager sign-off.",
+    "critical",
+    "22m ago",
+    0,
+    "/manager/reviews/sub-303",
+    303
+  );
+  notifStmt.run(
+    "notif-5",
+    "usr-sarah",
+    "sub-305",
+    "CRITICAL: JWT Algorithm Confusion Attack Vector",
+    "PR #305 (auth-service) \u2014 RS256/HS256 downgrade vulnerability allows full auth bypass. Block merge immediately.",
+    "critical",
+    "45m ago",
+    0,
+    "/manager/reviews/sub-305",
+    305
+  );
+  notifStmt.run(
+    "notif-6",
+    "usr-sarah",
+    "sub-302",
+    "Analysis Complete: Safe to Approve",
+    "PR #302 (user-api) \u2014 Zero security findings. Database migration reviewed clean. Ready for sign-off.",
+    "approval",
+    "30m ago",
+    0,
+    "/manager/reviews/sub-302",
+    302
+  );
+  notifStmt.run(
+    "notif-7",
+    "usr-sarah",
+    "sub-304",
+    "Analysis Complete: Safe to Approve",
+    "PR #304 (user-api) \u2014 Accessibility fixes only. No security vectors. Ready for authorization.",
+    "approval",
+    "18m ago",
+    0,
+    "/manager/reviews/sub-304",
+    304
   );
 }
 
